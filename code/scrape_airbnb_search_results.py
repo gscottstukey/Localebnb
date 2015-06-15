@@ -9,11 +9,11 @@ NUM_WEEKS = 26    # All Runs
 
 # NUM_GUESTS = {1}    # Testing
 # NUM_GUESTS = {1,2,4}    # First Run
-NUM_GUESTS = {1,4}    # Second Run
+NUM_GUESTS = {1,4}    # 2nd Run, 3rd Run, 4th rerun
 
 # NUM_PAGES = 1    # Testing
 # NUM_PAGES = 10    # First Run
-NUM_PAGES = 25    # Second Run
+NUM_PAGES = 25    # 2nd Run, 3rd Run, 4th rerun
 
 DB = 'airbnb'
 COLL = 'search'

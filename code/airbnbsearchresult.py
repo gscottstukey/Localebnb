@@ -8,9 +8,13 @@ notes: make sure mongod running. use `sudo mongod` in terminal
 import datetime
 import requests
 from bs4 import BeautifulSoup
-import pickle
 from pymongo import MongoClient
 import time
+
+try:
+   import cPickle as pickle
+except:
+   import pickle
 
 
 class AirBnBSearchResult(object):
@@ -21,7 +25,7 @@ class AirBnBSearchResult(object):
 
         required params:
             strings: city, state, country
-            dates (as strings in mm/dd/yyyy format): checkin, checkout
+            dates (as strings in mm-dd-yyyy format): checkin, checkout
             ints: guests, start_page, end_page, price_max
         """
 
@@ -70,6 +74,7 @@ class AirBnBSearchResult(object):
 
                 d = {'content':r.content,
                      'pickle': pkl,
+                     'time': time.time(),
                      'dt':datetime.datetime.utcnow(),
                      'city': self.city,
                      'state': self.state,
