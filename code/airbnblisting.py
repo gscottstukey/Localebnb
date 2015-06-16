@@ -85,7 +85,7 @@ class AirBnBListing(object):
         else:
             return True
 
-    def parse_features(self):
+    def extract_features(self):
         pass
 
 

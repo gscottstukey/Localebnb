@@ -8,11 +8,10 @@ import requests
 from pymongo import MongoClient
 import time
 import datetime
+from bs4 import BeautifulSoup
 
-try:
-   import cPickle as pickle
-except:
-   import pickle
+
+import pickle
 
 class AirBnBNeighborhood(object):
 
@@ -27,21 +26,32 @@ class AirBnBNeighborhood(object):
         self.db = client[db]
         self.coll = self.db[coll]
         
+        self.neighborhood_id = None
+        self.neighborhood = ""
+        self.url = ""
+        self.city_id = None
+        self.city = ""
+        
+        self.r = None
+        self.d = {}
 
 
     def scrape_and_insert(self, neighborhood_id, neighborhood, neighborhood_url, city_id, city):
         """
         G SCOTT TO FILL IN
         """
+        self.neighborhood_id = neighborhood_id
+        self.neighborhood = neighborhood
+        self.url = self.BASE_URL + neighborhood_url
+        self.city_id = city_id
+        self.city = city
 
-        url = self.BASE_URL + neighborhood_url
+        self.r = requests.get(self.url)
 
-        r = requests.get(url)
+        if self.r.status_code == 200:
+            pkl = pickle.dumps(self.r)    # pickling the requests object to allow parsing via Beautiful Soup later 
 
-        if r.status_code == 200:
-            pkl = pickle.dumps(r)    # pickling the requests object to allow parsing via Beautiful Soup later 
-
-            d = {'content':r.content,
+            self.d = {'content':self.r.content,
                  'pickle': pkl,
                  'time': time.time(),
                  'dt':datetime.datetime.utcnow(),
@@ -49,28 +59,98 @@ class AirBnBNeighborhood(object):
                  'neighborhood': neighborhood,
                  'url': url,
                  'requests_meta':{
-                     'status_code': r.status_code,
-                     'is_redirect': r.is_redirect,
-                     'is_ok': r.ok,
-                     'raise_for_status': r.raise_for_status(),
-                     'reason': r.reason
+                     'status_code': self.r.status_code,
+                     'is_redirect': self.r.is_redirect,
+                     'is_ok': self.r.ok,
+                     'raise_for_status': self.r.raise_for_status(),
+                     'reason': self.r.reason
                      }
                  }
     
         else:
-            d = {'time': time.time(),
+            self.d = {'time': time.time(),
                  'dt':datetime.datetime.utcnow(),
                  '_id': neighborhood_id,
                  'neighborhood': neighborhood,
                  'url': url,
                  'error': True,
                  'requests_meta':{
-                     'status_code': r.status_code,
-                     'is_redirect': r.is_redirect,
-                     'is_ok': r.ok,
-                     'raise_for_status': r.raise_for_status(),
-                     'reason': r.reason
+                     'status_code': self.r.status_code,
+                     'is_redirect': self.r.is_redirect,
+                     'is_ok': self.r.ok,
+                     'raise_for_status': self.r.raise_for_status(),
+                     'reason': self.r.reason
                      }
                 }
 
-        self.coll.insert(d)
+        self.coll.insert(self.d)
+
+    def pull_from_db(self, neighborhood_id):
+        hood = self.coll.find_one({'_id':neighborhood_id})
+
+        self.neighborhood_id = hood['_id']
+        self.neighborhood = hood['neighborhood']
+        self.url = hood['url']
+
+        self.r = pickle.loads(hood['pickle'])
+        self.d = hood
+
+    def is_in_collection(self):
+        if not self.coll.find_one({'_id':self.neighborhood_id}):
+            return False
+        else:
+            return True
+
+
+    def is_other_in_collection(self, neighborhood_id):
+        if not self.coll.find_one({'_id':neighborhood_id}):
+            return False
+        else:
+            return True
+
+    def extract_features(self):
+        features = {}
+        
+        soup = BeautifulSoup(self.r.content)
+
+        headline = soup.find('div', {'class':'center description'}).get_text().strip()
+        features['headline'] = headline
+        description = soup.find('meta', {'name':'description'})['content']
+        features['description'] = description
+
+        traits = []
+        for trait in soup.find('ul', {'class':'traits'}).find_all('span'):
+            traits.append(trait.get_text())
+        features['traits'] = traits
+
+        tags = []
+        for tag in soup.find_all('div', {'class':'neighborhood-tag'}):
+            tags.append(tag.get_text().strip())
+        features['tags'] = tags
+
+        similar_hoods = []
+        for similar_hood in soup.find('ul', {'class':'trait-neighborhoods neighborhoods'}).find_all('li'):
+            similar_hoods.append(similar_hood['data-neighborhood-permalink'])
+        features['similar_hoods'] = similar_hoods
+
+        # G Scott - of note, there might be some issues of hoods "within" hoods
+        neighboring_hoods = []
+        for neighboring_hood in soup.find('p', {'class':'lede center'}).find_all('a'):
+            neighboring_hoods.append(neighboring_hood.get_text())
+        features['neighboring_hoods'] = neighboring_hoods
+
+        public_trans = soup.find('div', {'class':'caption bar'}).find_all('li')[0].strong.get_text()
+        features['public_trans'] = public_trans
+        having_a_car = soup.find('div', {'class':'caption bar'}).find_all('li')[1].strong.get_text()
+        features['having_a_car'] = having_a_car
+
+        data_bbox = soup.find('div', {'id':'inner-map'})['data-bbox']
+        features['data_bbox'] = data_bbox
+        data_x = float(soup.find('div', {'id':'inner-map'})['data-x'])
+        features['data_x'] = data_x
+        data_y = float(soup.find('div', {'id':'inner-map'})['data-y'])
+        features['data_y'] = data_y
+
+        return features
+
+

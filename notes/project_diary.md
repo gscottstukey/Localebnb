@@ -66,3 +66,10 @@ TODO:
 * Create a file that maps the neighborhood to the listing
 * explore the words
 * Keep Calm & Scrape On
+
+Night update - SUCCESS! I ran multi_listing_scrape.py and it's been running for hours. 
+'''
+Mongo (console):
+> db.listings.find({'time':{'$gt':0}}).count()
+3599   # as of midnight
+'''
