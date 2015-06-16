@@ -74,6 +74,3 @@ class AirBnBNeighborhood(object):
                 }
 
         self.coll.insert(d)
-
-    def test_insert(self):
-        self.coll.insert({'foo':'bar'})

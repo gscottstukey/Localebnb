@@ -17,8 +17,52 @@ I created '1_clean_explore_mongo_results.ipynb', to explore the results from my 
         2779
     '''
 
-So with that, I went back and ran my scrape_airbnb_search_results.py a a 2nd time using updated NUM_PAGES in airbnbsearchresult. I also added a pause_between_pages parameter to the scrape_all_results method (in case I want to pause). I also made the pickling & record insertion dependent on whether there was a 200 status code.  
+So with that, I went back and ran my scrape_search_results.py a a 2nd time using updated NUM_PAGES in *searchresult.py. I also added a pause_between_pages parameter to the scrape_all_results method (in case I want to pause). I also made the pickling & record insertion dependent on whether there was a 200 status code.  
 
 WANT:
-Still wish I had an easier way to check if the scrape errored out or not.  Perhaps after run 3 I'll be able to find that out
+* Still wish I had an easier way to check if the scrape errored out or not.  Perhaps after run 3 I'll be able to find that out
 
+
+###6.15
+
+So I was able to scrape all the neighborhoods! YAY!
+    '''
+    MongoDB (console):
+    > db.neighborhoods.count()
+    102
+    '''
+
+This was done by creating *neighborhood.py and running it with scrape_*_neighborhood_list.py & scrape_*_neighborhoods. I got some good information that's ready to parse, which I might do tonight or tomorrow.
+
+In addition, I reran my scrape_*_search_results.py after my mongodb database got corrupted. I also grabbed all the listings. I put all the id's in the 'listings' collection. This was done using parse_listings_from_search.py
+
+    '''
+    MongoDB (console):
+    > db.search.count()
+    5200
+
+    iPython (workbook 1):
+    print len(listing_ids)    # list of all ids I've found
+    44985
+    print len(set(listing_ids))    # unique ids
+    4217
+
+    > db.listings.count()
+    4228
+    '''
+ 
+
+I also made great headway into *listing.py class. It's the cleanest class I have. Unfortunately, I'm getting blcoked is blocking me. Womps. I've pull ~ 500 of my 4k. I have enough to play around with while I run the script sporadically.
+
+    '''
+    iPython (workbook 2):
+    air_listing.coll.find({'time':{'$gt':0}},{'content':1}).count()
+    523    # As of Mon, 6/15 @ 744
+    '''
+
+TODO:
+* Create methods to parse through a listing & save that information back to MongoDB
+* Create methods to parse through a neighborhood & save that information back to MongoDB
+* Create a file that maps the neighborhood to the listing
+* explore the words
+* Keep Calm & Scrape On

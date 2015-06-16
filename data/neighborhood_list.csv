@@ -1,0 +1,103 @@
+neighborhood_id,neighborhood,neighborhood_url,city_id,city
+0,Alamo Square,/locations/san-francisco/alamo-square,1,san-francisco
+1,Bayview,/locations/san-francisco/bayview,1,san-francisco
+2,Bernal Heights,/locations/san-francisco/bernal-heights,1,san-francisco
+3,Chinatown,/locations/san-francisco/chinatown,1,san-francisco
+4,Civic Center,/locations/san-francisco/civic-center,1,san-francisco
+5,Cole Valley,/locations/san-francisco/cole-valley,1,san-francisco
+6,Cow Hollow,/locations/san-francisco/cow-hollow,1,san-francisco
+7,Dogpatch,/locations/san-francisco/dogpatch,1,san-francisco
+8,Downtown,/locations/san-francisco/downtown,1,san-francisco
+9,Duboce Triangle,/locations/san-francisco/duboce-triangle,1,san-francisco
+10,Excelsior,/locations/san-francisco/excelsior,1,san-francisco
+11,Financial District,/locations/san-francisco/financial-district,1,san-francisco
+12,Fisherman's Wharf,/locations/san-francisco/fisherman-s-wharf,1,san-francisco
+13,Glen Park,/locations/san-francisco/glen-park,1,san-francisco
+14,Haight-Ashbury,/locations/san-francisco/haight-ashbury,1,san-francisco
+15,Hayes Valley,/locations/san-francisco/hayes-valley,1,san-francisco
+16,Inner Sunset,/locations/san-francisco/inner-sunset,1,san-francisco
+17,Japantown,/locations/san-francisco/japantown,1,san-francisco
+18,Lower Haight,/locations/san-francisco/lower-haight,1,san-francisco
+19,Marina,/locations/san-francisco/marina,1,san-francisco
+20,Mission Bay,/locations/san-francisco/mission-bay,1,san-francisco
+21,Mission District,/locations/san-francisco/mission-district,1,san-francisco
+22,Mission Terrace,/locations/san-francisco/mission-terrace,1,san-francisco
+23,Nob Hill,/locations/san-francisco/nob-hill,1,san-francisco
+24,Noe Valley,/locations/san-francisco/noe-valley,1,san-francisco
+25,North Beach,/locations/san-francisco/north-beach,1,san-francisco
+26,Outer Sunset,/locations/san-francisco/sunset-district,1,san-francisco
+27,Pacific Heights,/locations/san-francisco/pacific-heights,1,san-francisco
+28,Parkside,/locations/san-francisco/parkside,1,san-francisco
+29,Portola,/locations/san-francisco/portola,1,san-francisco
+30,Potrero Hill,/locations/san-francisco/potrero-hill,1,san-francisco
+31,Presidio Heights,/locations/san-francisco/presidio-heights,1,san-francisco
+32,Richmond District,/locations/san-francisco/richmond-district,1,san-francisco
+33,Russian Hill,/locations/san-francisco/russian-hill,1,san-francisco
+34,SoMa,/locations/san-francisco/soma,1,san-francisco
+35,South Beach,/locations/san-francisco/south-beach,1,san-francisco
+36,Telegraph Hill,/locations/san-francisco/telegraph-hill,1,san-francisco
+37,Tenderloin,/locations/san-francisco/tenderloin,1,san-francisco
+38,The Castro,/locations/san-francisco/the-castro,1,san-francisco
+39,Twin Peaks,/locations/san-francisco/twin-peaks,1,san-francisco
+40,Visitacion Valley,/locations/san-francisco/visitacion-valley,1,san-francisco
+41,Western Addition/NOPA,/locations/san-francisco/western-addition-nopa,1,san-francisco
+42,Alphabet City,/locations/new-york/alphabet-city,2,new-york
+43,Astoria,/locations/new-york/astoria,2,new-york
+44,Battery Park City,/locations/new-york/battery-park-city,2,new-york
+45,Bedford-Stuyvesant,/locations/new-york/bedford-stuyvesant,2,new-york
+46,Boerum Hill,/locations/new-york/boerum-hill,2,new-york
+47,Brooklyn Heights,/locations/new-york/brooklyn-heights,2,new-york
+48,Bushwick,/locations/new-york/bushwick,2,new-york
+49,Carroll Gardens,/locations/new-york/carroll-gardens,2,new-york
+50,Chelsea,/locations/new-york/chelsea,2,new-york
+51,Chinatown,/locations/new-york/chinatown,2,new-york
+52,Civic Center,/locations/new-york/civic-center,2,new-york
+53,Clinton Hill,/locations/new-york/clinton-hill,2,new-york
+54,Cobble Hill,/locations/new-york/cobble-hill,2,new-york
+55,Crown Heights,/locations/new-york/crown-heights,2,new-york
+56,Downtown Brooklyn,/locations/new-york/downtown-brooklyn,2,new-york
+57,DUMBO,/locations/new-york/dumbo,2,new-york
+58,East Harlem,/locations/new-york/east-harlem,2,new-york
+59,East Village,/locations/new-york/east-village,2,new-york
+60,Financial District,/locations/new-york/financial-district,2,new-york
+61,Flatbush,/locations/new-york/flatbush,2,new-york
+62,Flatiron District,/locations/new-york/flatiron-district,2,new-york
+63,Flushing,/locations/new-york/flushing,2,new-york
+64,Fort Greene,/locations/new-york/fort-greene,2,new-york
+65,Gowanus,/locations/new-york/gowanus,2,new-york
+66,Gramercy Park,/locations/new-york/gramercy-park,2,new-york
+67,Greenpoint,/locations/new-york/greenpoint,2,new-york
+68,Greenwich Village,/locations/new-york/greenwich-village,2,new-york
+69,Harlem,/locations/new-york/harlem,2,new-york
+70,Hell's Kitchen,/locations/new-york/hell-s-kitchen,2,new-york
+71,Hudson Square,/locations/new-york/hudson-square,2,new-york
+72,Inwood,/locations/new-york/inwood,2,new-york
+73,Jackson Heights,/locations/new-york/jackson-heights,2,new-york
+74,Kensington,/locations/new-york/kensington,2,new-york
+75,Kips Bay,/locations/new-york/kips-bay,2,new-york
+76,Lefferts Garden,/locations/new-york/lefferts-garden,2,new-york
+77,Little Italy,/locations/new-york/little-italy,2,new-york
+78,Long Island City,/locations/new-york/long-island-city,2,new-york
+79,Lower East Side,/locations/new-york/lower-east-side,2,new-york
+80,Meatpacking District,/locations/new-york/meatpacking-district,2,new-york
+81,Midtown,/locations/new-york/midtown,2,new-york
+82,Midtown East,/locations/new-york/midtown-east,2,new-york
+83,Morningside Heights,/locations/new-york/morningside-heights,2,new-york
+84,Murray Hill,/locations/new-york/murray-hill,2,new-york
+85,Noho,/locations/new-york/noho,2,new-york
+86,Nolita,/locations/new-york/nolita,2,new-york
+87,Park Slope,/locations/new-york/park-slope,2,new-york
+88,Prospect Heights,/locations/new-york/prospect-heights,2,new-york
+89,Red Hook,/locations/new-york/red-hook,2,new-york
+90,Ridgewood,/locations/new-york/ridgewood,2,new-york
+91,Soho,/locations/new-york/soho,2,new-york
+92,South Street Seaport,/locations/new-york/south-street-seaport,2,new-york
+93,Times Square/Theatre District,/locations/new-york/times-square-theatre-district,2,new-york
+94,Tribeca,/locations/new-york/tribeca,2,new-york
+95,Union Square,/locations/new-york/union-square,2,new-york
+96,Upper East Side,/locations/new-york/upper-east-side,2,new-york
+97,Upper West Side,/locations/new-york/upper-west-side,2,new-york
+98,Washington Heights,/locations/new-york/washington-heights,2,new-york
+99,West Village,/locations/new-york/west-village,2,new-york
+100,Williamsburg,/locations/new-york/williamsburg,2,new-york
+101,Windsor Terrace,/locations/new-york/windsor-terrace,2,new-york
