@@ -5,7 +5,6 @@ notes: make sure mongod running. use `sudo mongod` in terminal
 notes: use VPN
 '''
 
-from multiprocessing import Pool
 from airbnblisting import AirBnBListing
 import time
 

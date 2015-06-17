@@ -9,13 +9,14 @@ from pymongo import MongoClient
 import time
 import datetime
 from bs4 import BeautifulSoup
+from unidecode import unidecode
 
 
 import pickle
 
 class AirBnBNeighborhood(object):
 
-    def __init__(self, db, coll):
+    def __init__(self, db_name, coll_name):
         """
         This is a class for searching AirBnBNeighborhood
         """
@@ -23,8 +24,8 @@ class AirBnBNeighborhood(object):
         self.BASE_URL = "https://www.airbnb.com"
 
         client = MongoClient()
-        self.db = client[db]
-        self.coll = self.db[coll]
+        self.db = client[db_name]
+        self.coll = self.db[coll_name]
         
         self.neighborhood_id = None
         self.neighborhood = ""
@@ -57,6 +58,8 @@ class AirBnBNeighborhood(object):
                  'dt':datetime.datetime.utcnow(),
                  '_id': neighborhood_id,
                  'neighborhood': neighborhood,
+                 'city_id':city_id,
+                 'city':city,
                  'url': url,
                  'requests_meta':{
                      'status_code': self.r.status_code,
@@ -72,6 +75,8 @@ class AirBnBNeighborhood(object):
                  'dt':datetime.datetime.utcnow(),
                  '_id': neighborhood_id,
                  'neighborhood': neighborhood,
+                 'city_id':city_id,
+                 'city':city,
                  'url': url,
                  'error': True,
                  'requests_meta':{
@@ -114,13 +119,16 @@ class AirBnBNeighborhood(object):
         soup = BeautifulSoup(self.r.content)
 
         headline = soup.find('div', {'class':'center description'}).get_text().strip()
-        features['headline'] = headline
+        features['headline'] = unidecode(headline)
+
         description = soup.find('meta', {'name':'description'})['content']
-        features['description'] = description
+        features['description'] = unidecode(description)
 
         traits = []
-        for trait in soup.find('ul', {'class':'traits'}).find_all('span'):
-            traits.append(trait.get_text())
+        traits_html = soup.find('ul', {'class':'traits'})
+        if traits_html != None:
+            for trait in traits_html.find_all('span'):
+                traits.append(trait.get_text())
         features['traits'] = traits
 
         tags = []
@@ -129,20 +137,24 @@ class AirBnBNeighborhood(object):
         features['tags'] = tags
 
         similar_hoods = []
-        for similar_hood in soup.find('ul', {'class':'trait-neighborhoods neighborhoods'}).find_all('li'):
-            similar_hoods.append(similar_hood['data-neighborhood-permalink'])
+        similar_hood_html = soup.find('ul', {'class':'trait-neighborhoods neighborhoods'})
+        if similar_hood_html != None:
+            for similar_hood in similar_hood_html.find_all('li'):
+                similar_hoods.append(similar_hood['data-neighborhood-permalink'])
         features['similar_hoods'] = similar_hoods
 
-        # G Scott - of note, there might be some issues of hoods "within" hoods
+        # G SCOTT - of note, there might be some issues of hoods "within" hoods
         neighboring_hoods = []
         for neighboring_hood in soup.find('p', {'class':'lede center'}).find_all('a'):
             neighboring_hoods.append(neighboring_hood.get_text())
         features['neighboring_hoods'] = neighboring_hoods
 
-        public_trans = soup.find('div', {'class':'caption bar'}).find_all('li')[0].strong.get_text()
-        features['public_trans'] = public_trans
-        having_a_car = soup.find('div', {'class':'caption bar'}).find_all('li')[1].strong.get_text()
-        features['having_a_car'] = having_a_car
+        caption_bar = soup.find('div', {'class':'caption bar'}).find_all('li')
+        if caption_bar != []:
+            public_trans = soup.find('div', {'class':'caption bar'}).find_all('li')[0].strong.get_text()
+            features['public_trans'] = public_trans
+            having_a_car = soup.find('div', {'class':'caption bar'}).find_all('li')[1].strong.get_text()
+            features['having_a_car'] = having_a_car
 
         data_bbox = soup.find('div', {'id':'inner-map'})['data-bbox']
         features['data_bbox'] = data_bbox
@@ -153,4 +165,16 @@ class AirBnBNeighborhood(object):
 
         return features
 
+    def add_features(self, new_features):
+        '''
+        add features to the currently loaded neighborhood
+        INPUT: new_features = dict of features
+        OUTPUT: None
+        '''
 
+        self.coll.update({'_id':self.neighborhood_id},{'$set':new_features})
+
+
+    def extract_and_add_features(self):
+        new_features = self.extract_features()
+        self.add_features(new_features=new_features)
