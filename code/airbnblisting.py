@@ -82,9 +82,9 @@ class AirBnBListing(object):
 
     def is_other_in_collection(self, listing_id):
         return bool(self.coll.find_one({'_id':listing_id}))
-        
 
-    def _clean_description(d):
+
+    def _clean_description(self, d):
         d = d.replace('\nThe Space\n', "", 1)
         d = d.replace('\nGuest Access\n', "", 1)
         d = d.replace('\nInteraction with Guests\n', "", 1)
@@ -155,7 +155,7 @@ class AirBnBListing(object):
         return features
 
 
-    def _extract_features_for_project_name(self):
+    def _extract_clean_description(self):
 
         soup = BeautifulSoup(self.r.content)
 
@@ -164,7 +164,6 @@ class AirBnBListing(object):
             return self._clean_description(description_raw)
         except:
             return ""
-
 
     def add_features(self, new_features):
         '''
