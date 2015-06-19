@@ -35,6 +35,7 @@ def main():
     city_list = import_city_list('../data/city_list.csv')
     date_list = create_date_list()
 
+    
     for city in city_list:
         for num_guests in NUM_GUESTS:
             for date in date_list:

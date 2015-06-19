@@ -1,0 +1,127 @@
+<!doctype html>
+<html>
+<head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <!-- The above 3 meta tags *must* come first in the head; any other head content must come *after* these tags -->
+    <title>localeBnB: AirBnB Contexualizer</title>
+
+    <!-- Bootstrap core CSS -->
+    <link href="../static/css/bootstrap.min.css" rel="stylesheet">
+    <!-- Bootstrap theme -->
+    <link href="../static/css/bootstrap-theme.min.css" rel="stylesheet">
+    <!-- Custom styles for this template -->
+    <link href="../static/css/navbar-fixed-top.css" rel="stylesheet">
+
+    <script src="../static/js/ie-emulation-modes-warning.js"></script>
+    
+
+    <!-- HTML5 shim and Respond.js for IE8 support of HTML5 elements and media queries -->
+    <!--[if lt IE 9]>
+      <script src="https://oss.maxcdn.com/html5shiv/3.7.2/html5shiv.min.js"></script>
+      <script src="https://oss.maxcdn.com/respond/1.4.2/respond.min.js"></script>
+    <![endif]-->
+</head>
+
+<body>
+    <!-- Fixed navbar -->
+    <nav class="navbar navbar-default navbar-fixed-top">
+      <div class="container">
+        <div class="navbar-header">
+          <button type="button" class="navbar-toggle collapsed" data-toggle="collapse" data-target="#navbar" aria-expanded="false" aria-controls="navbar">
+            <span class="sr-only">Toggle navigation</span>
+            <span class="icon-bar"></span>
+            <span class="icon-bar"></span>
+            <span class="icon-bar"></span>
+          </button>
+          <a class="navbar-brand" href="#">localeBnB</a>
+        </div>
+        <div id="navbar" class="navbar-collapse collapse">
+          <ul class="nav navbar-nav">
+            <li><a href="/about">About</a></li>
+          </ul>
+          <ul class="nav navbar-nav navbar-right">
+            <li><a href="/contact">Contact</a></li>
+          </ul>
+        </div><!--/.nav-collapse -->
+      </div>
+    </nav>
+    
+    <div class="container theme-showcase" role="main">
+
+        <div class="jumbotron" align="center">
+            <h1>localeBnB</h1>
+            <h3>An AirBnB Contextual Recommender</h3>
+        </div>
+        
+        <br>
+        
+        <form action="/search" method='POST' name="searchform1" id="searchform1">
+          <div class="form-group">
+            <h2>Choose City:</h2>
+            {% for city in cities%}
+            <div class="radio-inline">
+              <label class="radio-inline">
+                <input type="radio" name="cityRadio" id="cityRadio{{city['id']}}" value={{city['city']}}><p>{{city['label']}}</p>
+              </label>
+            </div>
+            {% endfor %}
+            <div class="radio-inline disabled">
+              <label class="radio-inline">
+                <input type="radio" name="cityRadio" id="cityRadio0" value="OTHER" disabled> <!--Other-->
+                <input type="text" class="form-control" size="50" name="city" placeholder="(OPTION NOT AVAILABLE)"/>
+              </label>
+            </div>
+          </div>
+          
+          <div class="form-group">
+            <h2>Number of Guests:</h2>
+            <div class="radio-inline">
+              <select name="numGuests">
+                <option value="1">1</option>
+                <option value="2" disabled>2</option>
+                <option value="4">4</option>
+            </select>
+            </div>
+          </div>
+
+          <div class="form-group">
+            <h2>Checkin Date:</h2>
+            <input type="date" name="checkin" />
+          </div>
+          
+          <div class="form-group">
+            <h2>Select Trait Weights:</h2>
+            {% for trait in traits%}
+              <div class="form-group">
+                <h5>{{trait}}</h5>
+                <div class="radio-inline">
+                  <label class="radio-inline">  
+                    {% for weight in trait_weights%}
+                      <input type="radio" name="{{trait}}Radio" id="{{trait}}Radio{{weight['id']}}" value="{{weight['value']}}" {%if weight['id']==2%}checked{% endif %}>
+                      {{weight['label']}}
+                    {% endfor %}
+                  </label>
+                </div>
+              </div>
+            <br>
+            {% endfor %}
+          </div>
+          <div class="form-group">
+            <button type="submit" class="btn btn-primary">Search AirBnB</button>
+          </div>
+        </form>
+    </div>
+
+    <!-- Bootstrap core JavaScript
+    ================================================== -->
+    <!-- Placed at the end of the document so the pages load faster -->
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/1.11.3/jquery.min.js"></script>
+    <script src="../static/js/bootstrap.min.js"></script>
+    <!-- IE10 viewport hack for Surface/desktop Windows 8 bug -->
+    <script src="../static/js/ie10-viewport-bug-workaround.js"></script>
+</body>
+</html>
+
+

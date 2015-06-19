@@ -11,15 +11,12 @@ from bs4 import BeautifulSoup
 from pymongo import MongoClient
 import time
 
-try:
-   import cPickle as pickle
-except:
-   import pickle
+import pickle
 
 
 class AirBnBSearchResult(object):
 
-    def __init__(self, db, coll, params):
+    def __init__(self, db_name, coll_name, params):
         """
         This is a class for searching AirBnBSearchResults
 
@@ -34,8 +31,8 @@ class AirBnBSearchResult(object):
         client = MongoClient()
 
         #mandatory parameters
-        self.db = client[db]
-        self.coll = self.db[coll]
+        self.db = client[db_name]
+        self.coll = self.db[coll_name]
         self.city = params['city']
         self.state = params['state']
         self.country = params['country']
@@ -95,7 +92,7 @@ class AirBnBSearchResult(object):
             if insert_into_db: self.coll.insert(d)
 
             time.sleep(pause_between_pages)
-
+            
 
     def test_insert(self):
         self.coll.insert({'foo':'bar'})

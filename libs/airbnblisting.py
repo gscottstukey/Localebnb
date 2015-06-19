@@ -85,16 +85,16 @@ class AirBnBListing(object):
 
 
     def _clean_description(self, d):
-        d = d.replace('\nThe Space\n', "", 1)
-        d = d.replace('\nGuest Access\n', "", 1)
-        d = d.replace('\nInteraction with Guests\n', "", 1)
-        d = d.replace('\nThe Neighbourhood\n', "", 1)    # CA specific
-        d = d.replace('\nThe Neighborhood\n', "", 1)    # US specific
-        d = d.replace('\nGetting Around\n', "", 1)   
-        d = d.replace('\nOther Things to Note\n', "", 1)
+        # d = d.replace('\nThe Space\n', "", 1)
+        # d = d.replace('\nGuest Access\n', "", 1)
+        # d = d.replace('\nInteraction with Guests\n', "", 1)
+        # d = d.replace('\nThe Neighbourhood\n', "", 1)    # CA specific
+        # d = d.replace('\nThe Neighborhood\n', "", 1)    # US specific
+        # d = d.replace('\nGetting Around\n', "", 1)   
+        # d = d.replace('\nOther Things to Note\n', "", 1)
         d = re.compile('[%s]' % re.escape(string.punctuation)).sub(' ', d)
-        d = ' '.join(d.split())
-        # d = d.replace('\n', " ")
+        d = d.replace('\n', " ")    # Remove line breaks
+        d = ' '.join(d.split())    # Remove multiple spaces
         d = d.lower()
         return d
 
@@ -131,6 +131,7 @@ class AirBnBListing(object):
         try:
             description_raw = soup.find('div', {'class':'row description'}).find('div', {'class':'expandable-content expandable-content-long'}).get_text()
             features['description_raw'] = description_raw
+            features['description_clean'] = self._clean_description(description_raw)
         except AttributeError:
             pass
 

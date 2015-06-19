@@ -73,3 +73,11 @@ Mongo (console):
 > db.listings.find({'time':{'$gt':0}}).count()
 3599   # as of midnight
 '''
+
+### 6.18
+
+The last few days have been a blur. I tested a crap ton of models, landing on NB as a nice basic NLP model to start with.  I created models across 4 labels (artsy, dining, shopping, nightlife), as well as my tfidf fit on y entire corpus. 
+
+I'm starting my web app now!  It will likely entail updating my searchresult class. 
+
+Here goes nothing!
