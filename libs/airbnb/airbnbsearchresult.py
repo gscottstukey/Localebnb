@@ -1,8 +1,5 @@
-
 """
-Script for scraping AirBnB's search results and inserting the raw HTML into a MongoDB database
-
-notes: make sure mongod running. use `sudo mongod` in terminal
+NOTES: make sure mongod running. use `sudo mongod` in terminal
 """
 
 import datetime
@@ -14,6 +11,14 @@ import pickle
 
 
 class AirBnBSearchResult(object):
+    '''
+    Initializes an AirBnBSearchResult object 
+    This allows you to scrape search result pages or retrieve them from MongoDB
+
+    INPUT: 
+    - db_name (str): 'airbnb' or 'airbnb_test'
+    - coll_name (str): 'search'
+    '''
 
     def __init__(self, db_name, coll_name):
         """
@@ -28,8 +33,6 @@ class AirBnBSearchResult(object):
         self.SEARCH_RESULT_URL = "https://www.airbnb.com/s/"
 
         client = MongoClient()
-
-        #mandatory parameters
         self.db = client[db_name]
         self.coll = self.db[coll_name]
 
@@ -48,7 +51,7 @@ class AirBnBSearchResult(object):
             self.price_max = params['price_max']
 
 
-    def scrape_all_results(self, start_page=1, end_page=1, insert_into_db = True, verbose = False, pause_between_pages=2.5):
+    def scrape_all_results(self, start_page=1, end_page=1, insert_into_db = True, pause_between_pages=1):
         """
         G SCOTT TO FILL IN
         """        

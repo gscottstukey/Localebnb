@@ -1,4 +1,0 @@
-scrape_airbnb_search_results Runs:
-1, ???, went smoothly.
-2, 6.12, errored out due to an "EOF occurred in violation of protocol (_ssl.c:581)"... 
-3, 6.12, ran updated with the r.status_code == 200 line. It ran without a hitch, minus being rather slow (considering the volume of information it was crunching, i'm not surprised). I had to stop it when it got to the NYC > 4 guests level due to other obligations and being unable to leave my computer running. If I were to do this again, I would set up a machine to run this code.

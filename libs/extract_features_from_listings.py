@@ -1,10 +1,13 @@
-'''
-Script to extract features from Listings
+"""
+Script to extract features from the Neighborhoods
 
-notes: make sure mongod running. use `sudo mongod` in terminal
-'''
+DEPENDENCIES:
+1) scrape_search_listings.py > MongoDB 'listings' collection
 
-from airbnblisting import AirBnBListing
+NOTES: make sure mongod running. use `sudo mongod` in terminal
+"""
+
+from airbnb.airbnblisting import AirBnBListing
 
 DB_NAME = 'airbnb'
 COLL_NAME = 'listings'

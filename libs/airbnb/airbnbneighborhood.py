@@ -1,7 +1,5 @@
 """
-Script for scraping AirBnB's search results and inserting the raw HTML into a MongoDB database
-
-notes: make sure mongod running. use `sudo mongod` in terminal
+NOTES: make sure mongod running. use `sudo mongod` in terminal
 """
 
 import requests
@@ -15,6 +13,14 @@ from unidecode import unidecode
 import pickle
 
 class AirBnBNeighborhood(object):
+    '''
+    Initializes an AirBnBSearchResult object 
+    This allows you to scrape search result pages or retrieve them from MongoDB
+
+    INPUT: 
+    - db_name (str): 'airbnb' or 'airbnb_test'
+    - coll_name (str): 'search'
+    '''
 
     def __init__(self, db_name, coll_name):
         """
@@ -50,25 +56,25 @@ class AirBnBNeighborhood(object):
         self.r = requests.get(self.url)
 
         if self.r.status_code == 200:
-            pkl = pickle.dumps(self.r)    # pickling the requests object to allow parsing via Beautiful Soup later 
+            pkl = pickle.dumps(self.r)
 
             self.d = {'content':self.r.content,
-                 'pickle': pkl,
-                 'time': time.time(),
-                 'dt':datetime.datetime.utcnow(),
-                 '_id': neighborhood_id,
-                 'neighborhood': neighborhood,
-                 'city_id':city_id,
-                 'city':city,
-                 'url': url,
-                 'requests_meta':{
-                     'status_code': self.r.status_code,
-                     'is_redirect': self.r.is_redirect,
-                     'is_ok': self.r.ok,
-                     'raise_for_status': self.r.raise_for_status(),
-                     'reason': self.r.reason
-                     }
-                 }
+                      'pickle': pkl,
+                      'time': time.time(),
+                      'dt':datetime.datetime.utcnow(),
+                      '_id': neighborhood_id,
+                      'neighborhood': neighborhood,
+                      'city_id':city_id,
+                      'city':city,
+                      'url': url,
+                      'requests_meta':{
+                          'status_code': self.r.status_code,
+                          'is_redirect': self.r.is_redirect,
+                          'is_ok': self.r.ok,
+                          'raise_for_status': self.r.raise_for_status(),
+                          'reason': self.r.reason
+                          }
+                      }
     
         else:
             self.d = {'time': time.time(),
@@ -89,6 +95,7 @@ class AirBnBNeighborhood(object):
                 }
 
         self.coll.insert(self.d)
+
 
     def pull_from_db(self, neighborhood_id):
         hood = self.coll.find_one({'_id':neighborhood_id})

@@ -6,8 +6,9 @@ import pickle
 app = Flask(__name__)
 from libs.airbnb.airbnbsearchresult import AirBnBSearchResult 
 from libs.airbnb.airbnblisting import AirBnBListing
-from libs.airbnb.app_helper import initialize_rank_scores
+from libs.app_helper import initialize_rank_scores
 import numpy as np
+import time
 
 DB_NAME = 'airbnb'
 SEARCH_COLL_NAME = 'search'
@@ -16,6 +17,7 @@ DEFAULT_RANK_SCORES = initialize_rank_scores()
 
 AIR_S = AirBnBSearchResult(db_name=DB_NAME, coll_name=SEARCH_COLL_NAME)
 AIR_L = AirBnBListing(db_name=DB_NAME, coll_name=LISTING_COLL_NAME)
+PAUSE_BETWEEN_LISTING_SCRAPES = 1
 
 # Load my pickled models into the app
 TFIDF = pickle.load(open('models/tfidf.pkl'))
@@ -23,7 +25,7 @@ MNB_ARTSY = pickle.load(open('models/mnb_artsy.pkl'))
 MNB_DINING = pickle.load(open('models/mnb_dining.pkl'))
 MNB_NIGHTLIFE = pickle.load(open('models/mnb_nightlife.pkl'))
 MNB_SHOPPING = pickle.load(open('models/mnb_shopping.pkl'))
-DEFAULT_VAL = .1
+DEFAULT_VAL = 0.1
 
 
 # G SCOTT: Is this the most efficient way to do this?
@@ -99,7 +101,8 @@ def search():
 
     for i, listing in enumerate(listings):
         if liveflag:
-            AIR_L.scrape_from_web(listing_id=listing, pause_between_pages=2)
+            AIR_L.scrape_from_web(listing_id=listing)
+            time.sleep(PAUSE_BETWEEN_LISTING_SCRAPES)
         else:
             AIR_L.pull_from_db(listing_id=listing)
 
@@ -121,7 +124,7 @@ def search():
 
 
         if liveflag:
-            description_clean = AIR_L._extract_clean_description()
+            description_clean = AIR_L.extract_clean_description()
             if description_clean != "":
                 vectorized_desc = TFIDF.transform([description_clean]).toarray()
                 listing_dict[listing]['is_artsy'] = int(MNB_ARTSY.predict(vectorized_desc)[0])
@@ -164,7 +167,7 @@ def search():
     # return str(checkin_test)
     # return city_text
     # return str(city['value'])
-    return render_template('search.html', sorted_listings = sorted_listings, listing_dict=listing_dict, map_center=map_center)
+    return render_template('search.html', sorted_listings = sorted_listings, listing_dict=listing_dict, map_center=map_center, city=city, state=state)
     # return str(listing_dict)
     # return AIR_S.r.content    # For debugging: used to show the cached AirBnB search from MongoDB
     
@@ -173,7 +176,8 @@ def search():
 def listing_page(listing_id):
     return listing_id
 
-@app.route('/about', methods=['POST'])
+
+@app.route('/about')
 def about():
     return "https://www.linkedin.com/in/gscottstukey"
 

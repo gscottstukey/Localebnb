@@ -5,50 +5,51 @@
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <!-- The above 3 meta tags *must* come first in the head; any other head content must come *after* these tags -->
-    <title>localeBnB: AirBnB Contexualizer</title>
+    <title>localeBnB - Search Results for {{city}}, {{state}}</title>
 
     <!-- Bootstrap core CSS -->
     <link href="../static/css/bootstrap.min.css" rel="stylesheet">
     <!-- Bootstrap theme -->
     <link href="../static/css/bootstrap-theme.min.css" rel="stylesheet">
+
     <!-- Custom styles for this template -->
     <link href="../static/css/navbar-fixed-top.css" rel="stylesheet">
-
     <script src="../static/js/ie-emulation-modes-warning.js"></script>
-
-    <script src="../static/js/sortable.min.js"></script>
-    <!-- <link rel="stylesheet" href="../static/css/sortable-theme-bootstrap.css" /> -->
-    
-
+    <link href="../static/css/localebnb_main.css" rel="stylesheet">
+    <script src="../static/js/jquery-1.11.3.min.js"></script>
     <!-- HTML5 shim and Respond.js for IE8 support of HTML5 elements and media queries -->
     <!--[if lt IE 9]>
       <script src="https://oss.maxcdn.com/html5shiv/3.7.2/html5shiv.min.js"></script>
       <script src="https://oss.maxcdn.com/respond/1.4.2/respond.min.js"></script>
     <![endif]-->
-    
+
+    <!-- Sortable tables -->
+    <script src="../static/js/sortable.min.js"></script>
+    <link href="../static/css/sortable-theme-boostrap-for-localebnb.css" rel="stylesheet">
+
     <!-- Mapbox -->
     <script src='https://api.tiles.mapbox.com/mapbox.js/v2.2.0/mapbox.js'></script>
     <link href='https://api.tiles.mapbox.com/mapbox.js/v2.2.0/mapbox.css' rel='stylesheet' />
 
+    <!-- Additional Styles -->
     <style>
-      #map {position:inherit; height:500px; width:90%; left-margin:auto;right-margin:auto;}
-      body,html {height: 100%;}
-      @font-face{font-family:Circular;src:url("https://a1.muscache.com/airbnb/static/o2.1/build/fonts/Circular_Air-Book-22799398756cc42454a77735013a3378.eot");src:url("https://a1.muscache.com/airbnb/static/o2.1/build/fonts/Circular_Air-Book-22799398756cc42454a77735013a3378.eot?#") format("eot"),url("https://a1.muscache.com/airbnb/static/o2.1/build/fonts/Circular_Air-Book-030dcebde359eb3be354ab21c34a89ce.woff") format("woff"),url("https://a1.muscache.com/airbnb/static/o2.1/build/fonts/Circular_Air-Book-287e910a06039c130e488343a7564c39.svg") format("svg");font-weight:normal;font-style:normal}@font-face{font-family:Circular;src:url("https://a2.muscache.com/airbnb/static/o2.1/build/fonts/Circular_Air-Book_Italic-35e1cf57d93dc4eb3db11cc2448cb91f.eot");src:url("https://a2.muscache.com/airbnb/static/o2.1/build/fonts/Circular_Air-Book_Italic-35e1cf57d93dc4eb3db11cc2448cb91f.eot?#") format("eot"),url("https://a1.muscache.com/airbnb/static/o2.1/build/fonts/Circular_Air-Book_Italic-1db902f5b85bbb0964e2994434edbe16.woff") format("woff"),url("https://a1.muscache.com/airbnb/static/o2.1/build/fonts/Circular_Air-Book_Italic-0d9eb203b260869dc2470ae35162fc1e.svg") format("svg");font-weight:normal;font-style:italic;}
-      @font-face{font-family:Circular;src:url("https://a0.muscache.com/airbnb/static/o2.1/build/fonts/Circular_Air-Bold-d74b6eea213711f97770fccaf37a7644.eot");src:url("https://a0.muscache.com/airbnb/static/o2.1/build/fonts/Circular_Air-Bold-d74b6eea213711f97770fccaf37a7644.eot?#") format("eot"),url("https://a2.muscache.com/airbnb/static/o2.1/build/fonts/Circular_Air-Bold-ba3e389678777af817295255589ca6f5.woff") format("woff"),url("https://a2.muscache.com/airbnb/static/o2.1/build/fonts/Circular_Air-Bold-3831f8bc07e9e70a9b42b4be3ea1a32c.svg") format("svg");font-weight:700;font-style:normal;}
-      body{font-family:Circular,sans-serif;font-size:14px;line-height:1.43;-webkit-font-smoothing:antialiased;-moz-osx-font-smoothing:grayscale;}
+      html, body {height: 100%;}
+      #map {position:inherit; height:500px; min-height: 100%; width:100%;}
+      #map-holder{height: 100%; min-height:100%;}
+      
+      .custom-popup .leaflet-popup-tip-container {
+        width:200px;
+        height:200px;
+        }
+      .custom-popup .leaflet-popup-tip {
+        border-left:15px solid transparent;
+        border-right:15px solid transparent;
+        border-top:15px solid #2c3e50;
+        }
+      .custom-popup > img {margin-left: auto; margin-right: auto;}
+
+      .table-hover tbody tr:hover td {background: #499BC9; font-color:#ffffff;}
     </style>
-    <style>
-        .custom-popup .leaflet-popup-tip-container {
-          width:200px;
-          height:200px;
-          }
-        .custom-popup .leaflet-popup-tip {
-          border-left:15px solid transparent;
-          border-right:15px solid transparent;
-          border-top:15px solid #2c3e50;
-          }
-        .custom-popup > img {margin-left: auto; margin-right: auto;}
-        </style>
 </head>
 
 <body>
@@ -76,53 +77,52 @@
     </nav>
     
     <div class="container" role="main">
-        
-          <div class="row-fluid">
-            <div class="span6">
-              <h3>Search Results:</h3>
-              <table class="table table-hover sortable-theme-bootstrap" data-sortable>
+          <!-- <div class="col"> -->
+            <h3>Search Results for {{city}}, {{state}}:</h3>
+            <div class="col-md-6">
+              <table class="table table-hover" id="data" data-sortable>
                 <thead>
                   <tr>
-                    <th data-field="rank">Rank</th>
-                    <th data-field="prev_rank">Prev_Rank</th>
+                    <th data-field="rank" data-sortable="true">Rank</th>
+                    <th data-field="prev_rank"  data-sortable="true">Prev Rank</th>
                     <th data-field="delta">&Delta;</th>
                     <!--<th>Image</th>-->
                     <th data-field="listing_name">Listing</th>
-                    <th data-field="room_type">Room_Type</th>
+                    <!-- <th data-field="room_type">Room_Type</th> -->
                     <th data-field="price">Price</th>
                     <!-- http://apps.timwhitlock.info/emoji/tables/unicode -->
-                    <th data-field="is_artsy" data-sortable="true">Artsy</th>
-                    <th data-field="is_shopping" data-sortable="true">Shopping</th>
-                    <th data-field="is_dining" data-sortable="true">Dining</th>
-                    <th data-field="is_nightlife" data-sortable="true">Nightlife</th>
+                    <th data-field="is_artsy">A</th>
+                    <th data-field="is_shopping" data-sortable="true">S</th>
+                    <th data-field="is_dining" data-sortable="true">D</th>
+                    <th data-field="is_nightlife" data-sortable="true">N</th>
                   </tr>
                 </thead>
 
                 {% for listing in sorted_listings%}
                 <tr>
-                  <td>{{listing_dict[listing]['position']}} ({{"%.2f" % listing_dict[listing]['score']}})</td>
-                  <td>{{listing_dict[listing]['default_position']}} ({{"%.2f" % listing_dict[listing]['default_score']}})</td>
+                  <td>{{"%02d" % listing_dict[listing]['position']}}<br><small><i>({{"%.2f" % listing_dict[listing]['score']}})</i></small></td>
+                  <td>{{"%02d" % listing_dict[listing]['default_position']}}<br><small><i>({{"%.2f" % listing_dict[listing]['default_score']}})</i></small></td>
                   <td><span{%if listing_dict[listing]['default_position'] - listing_dict[listing]['position'] >0 %} class="label label-success"{% endif %}{%if listing_dict[listing]['default_position'] - listing_dict[listing]['position'] <0 %} class="label label-danger"{% endif %}>{{listing_dict[listing]['default_position'] - listing_dict[listing]['position']}}</span></td>
                   <!--<td><img src={{listing_dict[listing]['thumbnail_img']}} height="100"></img></td>-->
-                  <td>{{listing_dict[listing]['blurb']}}</td>
-                  <td>{{listing_dict[listing]['listing_type']}}</td>
+                  <td>{{listing_dict[listing]['blurb']}}<br><small><i>({{listing_dict[listing]['listing_type']}})</i></small></td>
+                  <!-- <td></td> -->
                   <td>${{listing_dict[listing]['thumbnail_price']}}</td>
-                  <td>{{listing_dict[listing]['is_artsy']}}</td>
-                  <td>{{listing_dict[listing]['is_shopping']}}</td>
-                  <td>{{listing_dict[listing]['is_dining']}}</td>
-                  <td>{{listing_dict[listing]['is_nightlife']}}</td>
+                  <td>{{"%1d" % listing_dict[listing]['is_artsy']}}</td>
+                  <td>{{"%1d" % listing_dict[listing]['is_shopping']}}</td>
+                  <td>{{"%1d" % listing_dict[listing]['is_dining']}}</td>
+                  <td>{{"%1d" % listing_dict[listing]['is_nightlife']}}</td>
                 </tr>
                 {% endfor %}
               </table>
             </div>
-            <!-- <div class="span6"> -->
-              
-
-                
-
-             <!--  </div> -->
+            
+            <!-- </div> -->
+            <div class="col-md-6">
+              <div id="map-holder">
+                <div id='map'>
+                </div>
+              </div>
             </div>
-            <div id='map'></div>
               <script>
                 // Provide your access token
                 L.mapbox.accessToken = 'pk.eyJ1IjoiZ3NzdHVrZXkiLCJhIjoiY2U0MWVmOWZjYmNkOTI0YTIxNjQ1YWE0MWQ4OGJmZjEifQ.CKmOi88GHFvNuCl4AFmwaA';
@@ -131,41 +131,39 @@
                 var map = L.mapbox.map('map', 'gsstukey.mh7b69aa');
                 map.setView([{{map_center[0]}}, {{map_center[1]}}], 12);
 
-                var featureLayer = L.mapbox.featureLayer([
+                map.scrollWheelZoom.disable();
+
                 {% for listing in sorted_listings %}
+                var featureLayer{{listing_dict[listing]['position']}} = L.mapbox.featureLayer(
                 {
                   type: 'Feature',
                   geometry: {type: 'Point',coordinates: [{{listing_dict[listing]['lng']}},{{listing_dict[listing]['lat']}}]},
-                  properties: {title: '{{listing_dict[listing]['blurb']}}', description: 'ID: {{listing_dict[listing]['id']}}<br><img class="center-block" src="{{listing_dict[listing]['thumbnail_img']}}" height="150"><a href="http://localhost:6969/listing/{{listing_dict[listing]['id']}}">more info</a>','marker-size': 'large'}
-                },
-                {% endfor %}
-                ]).addTo(map);
+                  properties: {title: '{{listing_dict[listing]['blurb']}}', description: 'ID: {{listing_dict[listing]['id']}}<br><img class="center-block" src="{{listing_dict[listing]['thumbnail_img']}}" height="150"><a href="http://localhost:6969/listing/{{listing_dict[listing]['id']}}">more info</a>','marker-size': 'large', 'marker-symbol':'{{listing_dict[listing]['position']}}'}
+                }).addTo(map);
 
-                featureLayer.on('ready', function() {
-                    // featureLayer.getBounds() returns the corners of the furthest-out markers,
-                    // and map.fitBounds() makes sure that the map contains these.
-                    map.fitBounds(featureLayer.getBounds());
-                });
-
-                featureLayer.on('mouseover', function(e) {
+                featureLayer{{listing_dict[listing]['position']}}.on('mouseover', function(e) {
                     e.layer.openPopup();
                 });
+                {% endfor %}
+                
+
+                
+
                 // featureLayer.on('mouseout', function(e) {
                 //     e.layer.closePopup();
                 // });
                   
                 </script>
+
                 <script>
-                $(document).on('mouseenter', ".table-hover", function () {
-                    $(this).css("background-color", "yellow");
-                    var rank = $(this).children()[0].innerText;
-                    $('img[alt=\"' + rank + '\"]').attr('src', litUpIcon);
-                }).on('mouseleave', ".table-hover", function () {
-                    $(this).css("background-color", "white");
-                    var rank = $(this).children()[0].innerText;
-                    $('img[alt=\"' + rank + '\"]').attr('src', regularIcon);
+                $(document).on('mouseenter', "tr", function () {
+                   // do stuff console.log($(data)[0].children[1]);
+                }).on('mouseleave', "tr", function () {
+                    // do stuff
                 });
+                
                 </script>
+
     </div>
 
     <!-- Bootstrap core JavaScript

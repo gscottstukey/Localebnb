@@ -56,7 +56,6 @@ table[data-sortable] th[data-sorted-direction="ascending"]:after {
 
 /* line 5, ../sass/sortable-theme-bootstrap.sass */
 table[data-sortable].sortable-theme-bootstrap {
-  font-family: "Helvetica Neue", Helvetica, Arial, sans-serif;
   font-size: 14px;
   line-height: 20px;
   color: #333333;

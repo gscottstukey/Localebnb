@@ -1,3 +1,7 @@
+"""
+NOTES: make sure mongod running. use `sudo mongod` in terminal
+"""
+
 from pymongo import MongoClient
 import requests
 from bs4 import BeautifulSoup
@@ -8,12 +12,16 @@ import string
 import re
 
 class AirBnBListing(object):
+    '''
+    Initializes an AirBnBListing object 
+    This allows you to scrape listings or retrieve listings from MongoDB
+
+    INPUT: 
+    - db_name (str): 'airbnb' or 'airbnb_test'
+    - coll_name (str): 'listings'
+    '''
 
     def __init__(self, db_name, coll_name):
-        '''
-        INPUT: coll = an open connection to a MongoDB collection
-        '''
-
         self.BASE_ROOM_URL = "https://www.airbnb.com/rooms/"
 
         client = MongoClient()
@@ -26,9 +34,19 @@ class AirBnBListing(object):
         self.d = {}
 
 
-    def generate_listing_data(self):
-        pkl = pickle.dumps(self.r)
+    def scrape_from_web(self, listing_id):
+        '''
+        Scrapes a single listing's info from AirBnB
 
+        INPUT: 
+        - listing_id (int or str): the id of the listing you're trying to scrape
+        OUTPUT: None
+        '''
+
+        self.listing_id = str(listing_id)    # ensure listing_id is a string
+        self.url = self.BASE_ROOM_URL + self.listing_id
+        self.r = requests.get(self.url)
+        pkl = pickle.dumps(self.r)
         self.d = {'_id': self.listing_id,
                  'url': self.url,
                  'content':self.r.content,
@@ -45,23 +63,35 @@ class AirBnBListing(object):
                  }
 
 
-    def scrape_from_web(self, listing_id, pause_between_pages=1):
-        self.listing_id = listing_id
-        self.url = self.BASE_ROOM_URL + str(self.listing_id)    # Ensuring listing_id is a string
-        self.r = requests.get(self.url)
-        self.generate_listing_data()
-
-
     def pull_from_db(self, listing_id):
+        '''
+        Pulls a previously scraped listing's data from the MongoDB collection
+
+        INPUT: 
+        - listing_id (int or str): the id of the listing you're trying to pull
+        OUTPUT: None
+        '''
         listing = self.coll.find_one({'_id':listing_id})
+
         self.listing_id = listing_id
-        self.r = pickle.loads(listing['pickle'])
         self.url = listing['url']
+        self.r = pickle.loads(listing['pickle'])
         self.d = listing
 
 
-
     def insert_into_coll(self, overwrite=False):
+        '''
+        Inserts the current listing's data into the MongoDB collection
+        - If the listing does not exist, it gets inserted
+        - If the listing exists, the insertion depends on if we wish to overwrite
+
+        INPUT: 
+        - overwrite (bool): whether to overwrite if the listing already exists
+        OUTPUT:
+        - bool: 
+          * Returns True if a listing was inserted (new or overwriten)
+          * Return False if the listing existed and overwrite=False
+        '''
         if not self.is_in_collection():
             self.coll.insert(self.d)
             return True
@@ -73,19 +103,68 @@ class AirBnBListing(object):
 
 
     def scrape_and_insert(self, listing_id, overwrite=False):
+        '''
+        Runs scrape_from_web() & insert_into_coll() with parameters provided
+        NOTE: this method does NOT return what insert_into_coll returns
+
+        INPUT: 
+        - listing_id (int or str): the id of the listing you're trying to pull
+        - overwrite (bool): whether to overwrite if the listing already exists
+        OUTPUT: None
+        '''
         self.scrape_from_web(listing_id=listing_id)
         self.insert_into_coll(overwrite=overwrite)
 
 
-    def is_in_collection(self):
-        return bool(self.coll.find_one({'_id':self.listing_id}))
+
+    def is_in_collection(self, listing_id=None):
+        '''
+        Checks to see if the current listing's data is in the MongoDB collection
+        NOTE: this method is only useful in conjunction with scrape_from_web()
+
+        INPUT: 
+        - listing_id (None or int or str): 
+          * the id of the listing you're trying to pull
+          * if None (default), uses self.listing_id
+        OUTPUT: None
+        '''
+        if not listing_id:
+            listing_id = self.listing_id
+        else:
+            listing_id = str(listing_id)
+        return bool(self.coll.find_one({'_id':listing_id}))
 
 
     def is_other_in_collection(self, listing_id):
+        '''
+        ********** DEPRECIATED ***********
+        REASON: more efficient to combine this method wth is_in_collection()
+        SOLUTION: use is_in_collection() with explicit listing_id)
+        **********************************
+
+        Checks to see if an explicit listing's data is in the MongoDB collection
+        NOTE: this method is only useful in conjunction with scrape_from_web()
+
+        INPUT: None
+        OUTPUT: None
+        '''
         return bool(self.coll.find_one({'_id':listing_id}))
 
 
     def _clean_description(self, d):
+        '''
+        Cleans up an AirBnB description as defined by:
+            soup.find('div', {'class':'row description'}) \
+            .find('div', {'class':'expandable-content expandable-content-long'}) \
+            .get_text()
+        where soup is the BeautifulSoup of the page content
+
+        INPUT: 
+        - d (str): see above for how d is defined 
+        OUTPUT:
+        - str: returns the cleaned up string
+        '''
+        # remove section Names/headers of the AirBnB description
         # d = d.replace('\nThe Space\n', "", 1)
         # d = d.replace('\nGuest Access\n', "", 1)
         # d = d.replace('\nInteraction with Guests\n', "", 1)
@@ -93,14 +172,27 @@ class AirBnBListing(object):
         # d = d.replace('\nThe Neighborhood\n', "", 1)    # US specific
         # d = d.replace('\nGetting Around\n', "", 1)   
         # d = d.replace('\nOther Things to Note\n', "", 1)
+
+        # remove putuation
         d = re.compile('[%s]' % re.escape(string.punctuation)).sub(' ', d)
-        d = d.replace('\n', " ")    # Remove line breaks
-        d = ' '.join(d.split())    # Remove multiple spaces
+        # remove line breaks
+        d = d.replace('\n', " ") 
+        # remove multiple spaces   
+        d = ' '.join(d.split()) 
+        # convert the string to lowercase
         d = d.lower()
+
         return d
 
 
     def extract_features(self):
+        '''
+        Extracts all of the predefined features of the currently loaded listing
+
+        INPUT: None
+        OUTPUT:
+        - dict: the dictionary of the predefined features extracted 
+        '''
         features = {}
 
         soup = BeautifulSoup(self.r.content)
@@ -157,7 +249,16 @@ class AirBnBListing(object):
         return features
 
 
-    def _extract_clean_description(self):
+    def extract_clean_description(self):
+        '''
+        Extracts and returns the clean_description of the current listing
+
+        INPUT: None
+        OUTPUT:
+        - str: 
+          * if we're able to clean up the string, returns the cleaned description
+          * if we error out, we return an empty string
+        '''
 
         soup = BeautifulSoup(self.r.content)
 
@@ -167,24 +268,32 @@ class AirBnBListing(object):
         except:
             return ""
 
+
     def add_features(self, new_features):
         '''
-        add features to the currently loaded neighborhood
-        INPUT: new_features = dict of features
+        Adds new features to the currently loaded listing's data
+        Note: The listing must already exist in the MongoDB collection
+
+        INPUT: 
+        - new_features (dict): a dictionary of new features to add the the listing
         OUTPUT: None
         '''
         self.coll.update({'_id':self.listing_id},{'$set':new_features})
 
 
     def extract_and_add_features(self):
+        '''
+        Runs extract_features() on the currently loaded listing's data, 
+        and tthen runs add_features() to add them
+        Note: The listing must already exist in the MongoDB collection
+
+        INPUT: None
+        OUTPUT: None
+        '''
         new_features = self.extract_features()
         if new_features != {}:
             self.add_features(new_features=new_features)
         else:
             error_warning = {'error':1, 'message':'NO FEATURES EXTRACTED'}
             self.add_features(new_features=error_warning)
-
-
-
-
 
