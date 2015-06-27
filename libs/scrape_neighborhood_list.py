@@ -45,12 +45,12 @@ def main():
         soup = BeautifulSoup(r.content)
         neighborhood_list_raw = soup.find('div', {'class':'neighborhood-list'}).find_all('a')[1:]
         for hood in neighborhood_list_raw:
-            neighborhood_name = hood.get_text()
-            neighborhood_url = hood['href']
-            neighborhoods.append((neighborhood_name, neighborhood_url, city_id, city))
+            hood_name = hood.get_text()
+            hood_url = hood['href']
+            neighborhoods.append((hood_name, hood_url, city_id, city))
 
-    df = pd.DataFrame(neighborhoods, columns=["neighborhood", "neighborhood_url", "city_id", "city"])
-    df.to_csv(NEIGHBORHOOD_OUTPUT, index=True, index_label='neighborhood_id')
+    hood_df = pd.DataFrame(neighborhoods, columns=["neighborhood", "neighborhood_url", "city_id", "city"])
+    hood_df.to_csv(NEIGHBORHOOD_OUTPUT, index=True, index_label='neighborhood_id')
 
 
 if __name__=="__main__":

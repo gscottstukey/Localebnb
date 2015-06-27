@@ -12,14 +12,14 @@ import string
 import re
 
 class AirBnBListing(object):
-    '''
+    """
     Initializes an AirBnBListing object 
     This allows you to scrape listings or retrieve listings from MongoDB
 
     INPUT: 
     - db_name (str): 'airbnb' or 'airbnb_test'
     - coll_name (str): 'listings'
-    '''
+    """
 
     def __init__(self, db_name, coll_name):
         self.BASE_ROOM_URL = "https://www.airbnb.com/rooms/"
@@ -151,6 +151,146 @@ class AirBnBListing(object):
         return bool(self.coll.find_one({'_id':listing_id}))
 
 
+
+    def _expand_contractions(self, s):
+        '''
+        Helper Function to expand contractions:
+
+        INPUT: 
+        - s (str): raw description text
+        OUTPUT:
+        - str: the text with the contractions expanded
+        '''
+        #edited from
+        # http://stackoverflow.com/questions/19790188/expanding-english-language-contractions-in-python
+
+        contractions_dict = { 
+            "ain't": "am not",
+            "aren't": "are not",
+            "can't": "cannot",
+            "can't've": "cannot have",
+            "'cause": "because",
+            "could've": "could have",
+            "couldn't": "could not",
+            "couldn't've": "could not have",
+            "didn't": "did not",
+            "doesn't": "does not",
+            "don't": "do not",
+            "hadn't": "had not",
+            "hadn't've": "had not have",
+            "hasn't": "has not",
+            "haven't": "have not",
+            "he'd": "he would",
+            "he'd've": "he would have",
+            "he'll": "he will",
+            "he'll've": "he shall have / he will have",
+            "he's": "he is",
+            "how'd": "how did",
+            "how'd'y": "how do you",
+            "how'll": "how will",
+            "how's": "how is",
+            "i'd": "I would",
+            "i'd've": "I would have",
+            "i'll": "I will",
+            "i'll've": "i will have",
+            "i'm": "i am",
+            "i've": "i have",
+            "isn't": "is not",
+            "it'd": "it would",
+            "it'd've": "it would have",
+            "it'll": "it shall / it will",
+            "it'll've": "it shall have / it will have",
+            "it's": "it has / it is",
+            "let's": "let us",
+            "ma'am": "madam",
+            "mayn't": "may not",
+            "might've": "might have",
+            "mightn't": "might not",
+            "mightn't've": "might not have",
+            "must've": "must have",
+            "mustn't": "must not",
+            "mustn't've": "must not have",
+            "needn't": "need not",
+            "needn't've": "need not have",
+            "o'clock": "of the clock",
+            "oughtn't": "ought not",
+            "oughtn't've": "ought not have",
+            "shan't": "shall not",
+            "sha'n't": "shall not",
+            "shan't've": "shall not have",
+            "she'd": "she would",
+            "she'd've": "she would have",
+            "she'll": "she shall / she will",
+            "she'll've": "she shall have / she will have",
+            "she's": "she has / she is",
+            "should've": "should have",
+            "shouldn't": "should not",
+            "shouldn't've": "should not have",
+            "so've": "so have",
+            "so's": "so as / so is",
+            "that'd": "that would",
+            "that'd've": "that would have",
+            "that's": "tthat is",
+            "there'd": "there had / there would",
+            "there'd've": "there would have",
+            "there's": "there is",
+            "they'd": "they would",
+            "they'd've": "they would have",
+            "they'll": "they will",
+            "they'll've": "they shall have / they will have",
+            "they're": "they are",
+            "they've": "they have",
+            "to've": "to have",
+            "wasn't": "was not",
+            "we'd": "we would",
+            "we'd've": "we would have",
+            "we'll": "we will",
+            "we'll've": "we will have",
+            "we're": "we are",
+            "we've": "we have",
+            "weren't": "were not",
+            "what'll": "what shall / what will",
+            "what'll've": "what shall have / what will have",
+            "what're": "what are",
+            "what's": "what has / what is",
+            "what've": "what have",
+            "when's": "when has / when is",
+            "when've": "when have",
+            "where'd": "where did",
+            "where's": "where has / where is",
+            "where've": "where have",
+            "who'll": "who shall / who will",
+            "who'll've": "who shall have / who will have",
+            "who's": "who has / who is",
+            "who've": "who have",
+            "why's": "why is",
+            "why've": "why have",
+            "will've": "will have",
+            "won't": "will not",
+            "won't've": "will not have",
+            "would've": "would have",
+            "wouldn't": "would not",
+            "wouldn't've": "would not have",
+            "y'all": "you all",
+            "y'all'd": "you all would",
+            "y'all'd've": "you all would have",
+            "y'all're": "you all are",
+            "y'all've": "you all have",
+            "you'd": "you would",
+            "you'd've": "you would have",
+            "you'll": "you will",
+            "you'll've": "you shall have / you will have",
+            "you're": "you are",
+            "you've": "you have"
+            }
+
+        contractions_re = re.compile('(%s)' % '|'.join(contractions_dict.keys()))
+
+        def replace(match):
+            return contractions_dict[match.group(0)]
+        return contractions_re.sub(replace, s)
+
+
     def _clean_description(self, d):
         '''
         Cleans up an AirBnB description as defined by:
@@ -165,22 +305,26 @@ class AirBnBListing(object):
         - str: returns the cleaned up string
         '''
         # remove section Names/headers of the AirBnB description
-        # d = d.replace('\nThe Space\n', "", 1)
-        # d = d.replace('\nGuest Access\n', "", 1)
-        # d = d.replace('\nInteraction with Guests\n', "", 1)
-        # d = d.replace('\nThe Neighbourhood\n', "", 1)    # CA specific
-        # d = d.replace('\nThe Neighborhood\n', "", 1)    # US specific
-        # d = d.replace('\nGetting Around\n', "", 1)   
-        # d = d.replace('\nOther Things to Note\n', "", 1)
+        d = d.replace('\nThe Space\n', "", 1)
+        d = d.replace('\nGuest Access\n', "", 1)
+        d = d.replace('\nInteraction with Guests\n', "", 1)
+        d = d.replace('\nThe Neighbourhood\n', "", 1)    # CA specific
+        d = d.replace('\nThe Neighborhood\n', "", 1)    # US specific
+        d = d.replace('\nGetting Around\n', "", 1)   
+        d = d.replace('\nOther Things to Note\n', "", 1)
 
-        # remove putuation
-        d = re.compile('[%s]' % re.escape(string.punctuation)).sub(' ', d)
+        # convert the string to lowercase
+        d = d.lower()
+        # expand all contractions
+        d = self._expand_contractions(d)
+        # remove all non words
+        d = re.sub("[^a-zA-Z]"," ", d) 
+        # remove punctuation
+        # d = re.compile('[%s]' % re.escape(string.punctuation)).sub(' ', d)
         # remove line breaks
         d = d.replace('\n', " ") 
         # remove multiple spaces   
         d = ' '.join(d.split()) 
-        # convert the string to lowercase
-        d = d.lower()
 
         return d
 
@@ -278,7 +422,7 @@ class AirBnBListing(object):
         - new_features (dict): a dictionary of new features to add the the listing
         OUTPUT: None
         '''
-        self.coll.update({'_id':self.listing_id},{'$set':new_features})
+        self.coll.update({'_id':self.listing_id},new_features)
 
 
     def extract_and_add_features(self):
