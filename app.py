@@ -20,11 +20,17 @@ AIR_L = AirBnBListing(db_name=DB_NAME, coll_name=LISTING_COLL_NAME)
 PAUSE_BETWEEN_LISTING_SCRAPES = 1
 
 # Load my pickled models into the app
-TFIDF = pickle.load(open('models/tfidf.pkl'))
-MNB_ARTSY = pickle.load(open('models/mnb_artsy.pkl'))
-MNB_DINING = pickle.load(open('models/mnb_dining.pkl'))
-MNB_NIGHTLIFE = pickle.load(open('models/mnb_nightlife.pkl'))
-MNB_SHOPPING = pickle.load(open('models/mnb_shopping.pkl'))
+# TFIDF = pickle.load(open('models/tfidf.pkl'))
+# MODEL_ARTSY = pickle.load(open('models/mnb_artsy.pkl'))
+# MODEL_DINING = pickle.load(open('models/mnb_dining.pkl'))
+# MODEL_NIGHTLIFE = pickle.load(open('models/mnb_nightlife.pkl'))
+# MODEL_SHOPPING = pickle.load(open('models/mnb_shopping.pkl'))
+
+TFIDF = pickle.load(open('models/tfidf_svc.pkl'))
+MODEL_ARTSY = pickle.load(open('models/svc_artsy_final.pkl'))
+MODEL_DINING = pickle.load(open('models/svc_dining_final.pkl'))
+MODEL_NIGHTLIFE = pickle.load(open('models/svc_nightlife_final.pkl'))
+MODEL_SHOPPING = pickle.load(open('models/svc_shopping_final.pkl'))
 DEFAULT_VAL = 0.1
 
 
@@ -50,15 +56,17 @@ def index():
 
 @app.route('/search', methods=['POST'])
 def search():
-    liveflag = request.form['livecacheRadio'] == "live"
+    # liveflag = request.form['livecacheRadio'] == "live"
 
-    if request.form['cityRadio'] != "OTHER":
+    if request.form['cityRadio'] != "live":
         city = request.form['cityRadio']
         state = CITY_DICT[city]['state']
+        liveflag = False
     else:
         city_input = request.form['cityWriteIn']
         city, state = [x.strip() for x in city_input.split(', ')]
         city = city.replace(' ','-')    # Turn the city into AirBnB format
+        liveflag = True
 
     checkin_input = request.form['checkinDate'].split('-')
     checkout_input = request.form['checkoutDate'].split('-')
@@ -67,10 +75,14 @@ def search():
     # checkin = '06-30-2015'    # Update with less contrived example
     num_guests = request.form['numGuests']
 
-    artsy_weight = float(request.form['artsyRadio'])
-    shopping_weight = float(request.form['shoppingRadio'])
-    dining_weight = float(request.form['diningRadio'])
-    nightlife_weight = float(request.form['nightlifeRadio'])
+    artsy_weight_input = request.form['artsyRadio']
+    artsy_weight = float(artsy_weight_input)
+    shopping_weight_input = request.form['shoppingRadio']
+    shopping_weight = float(shopping_weight_input)
+    dining_weight_input = request.form['diningRadio']
+    dining_weight = float(dining_weight_input)
+    nightlife_weight_input = request.form['nightlifeRadio']
+    nightlife_weight = float(nightlife_weight_input)
     
     
     # G SCOTT: Add checkout to params
@@ -89,6 +101,7 @@ def search():
     else:
         AIR_S.pull_one_from_db()
 
+
     listings = AIR_S.extract_listing_ids()
     listing_dict = {l:{'id':l} for l in listings}
     thumbnail_data = AIR_S.extract_thumbnail_data()
@@ -102,11 +115,14 @@ def search():
     for i, listing in enumerate(listings):
         if liveflag:
             AIR_L.scrape_from_web(listing_id=listing)
+            listing_dict[listing]['url'] = AIR_L.url
             time.sleep(PAUSE_BETWEEN_LISTING_SCRAPES)
         else:
-            AIR_L.pull_from_db(listing_id=listing)
+            AIR_L.pull_from_db_cached(listing_id=listing)
+            # added this after the production DB errored out
+            listing_dict[listing]['url'] = AIR_L.BASE_ROOM_URL + listing
 
-        listing_dict[listing]['url'] = AIR_L.url
+        # listing_dict[listing]['url'] = AIR_L.url
         listing_dict[listing]['default_position'] = i+1
         listing_dict[listing]['default_score'] = DEFAULT_RANK_SCORES[i]
         
@@ -127,10 +143,10 @@ def search():
             description_clean = AIR_L.extract_clean_description()
             if description_clean != "":
                 vectorized_desc = TFIDF.transform([description_clean]).toarray()
-                listing_dict[listing]['is_artsy'] = int(MNB_ARTSY.predict(vectorized_desc)[0])
-                listing_dict[listing]['is_shopping'] = int(MNB_SHOPPING.predict(vectorized_desc)[0])
-                listing_dict[listing]['is_dining'] = int(MNB_DINING.predict(vectorized_desc)[0])
-                listing_dict[listing]['is_nightlife'] = int(MNB_NIGHTLIFE.predict(vectorized_desc)[0])
+                listing_dict[listing]['is_artsy'] = int(MODEL_ARTSY.predict(vectorized_desc)[0])
+                listing_dict[listing]['is_shopping'] = int(MODEL_SHOPPING.predict(vectorized_desc)[0])
+                listing_dict[listing]['is_dining'] = int(MODEL_DINING.predict(vectorized_desc)[0])
+                listing_dict[listing]['is_nightlife'] = int(MODEL_NIGHTLIFE.predict(vectorized_desc)[0])
             else:
                 listing_dict[listing]['is_artsy'] = DEFAULT_VAL
                 listing_dict[listing]['is_shopping'] = DEFAULT_VAL
@@ -140,10 +156,10 @@ def search():
         elif not liveflag and 'description_clean' in AIR_L.d:
             description_clean = AIR_L.d['description_clean']
             vectorized_desc = TFIDF.transform([description_clean]).toarray()
-            listing_dict[listing]['is_artsy'] = int(MNB_ARTSY.predict(vectorized_desc)[0])
-            listing_dict[listing]['is_shopping'] = int(MNB_SHOPPING.predict(vectorized_desc)[0])
-            listing_dict[listing]['is_dining'] = int(MNB_DINING.predict(vectorized_desc)[0])
-            listing_dict[listing]['is_nightlife'] = int(MNB_NIGHTLIFE.predict(vectorized_desc)[0])
+            listing_dict[listing]['is_artsy'] = int(MODEL_ARTSY.predict(vectorized_desc)[0])
+            listing_dict[listing]['is_shopping'] = int(MODEL_SHOPPING.predict(vectorized_desc)[0])
+            listing_dict[listing]['is_dining'] = int(MODEL_DINING.predict(vectorized_desc)[0])
+            listing_dict[listing]['is_nightlife'] = int(MODEL_NIGHTLIFE.predict(vectorized_desc)[0])
         else:
             # G SCOTT: consider checking to see if the neighborhood is artsy or not based on my data
             listing_dict[listing]['is_artsy'] = DEFAULT_VAL
@@ -167,7 +183,7 @@ def search():
     # return str(checkin_test)
     # return city_text
     # return str(city['value'])
-    return render_template('search.html', sorted_listings = sorted_listings, listing_dict=listing_dict, map_center=map_center, city=city, state=state)
+    return render_template('search.html', sorted_listings = sorted_listings, listing_dict=listing_dict, map_center=map_center, city=city, state=state, traits=TRAITS, trait_weights=WEIGHTS, artsy_weight=artsy_weight, shopping_weight=shopping_weight, dining_weight=dining_weight, nightlife_weight=nightlife_weight)
     # return str(listing_dict)
     # return AIR_S.r.content    # For debugging: used to show the cached AirBnB search from MongoDB
     
@@ -183,5 +199,5 @@ def about():
 
 
 if __name__ == '__main__':
-    app.run(host='0.0.0.0', port=80, debug=True)
+    app.run(host='0.0.0.0', port=7777, debug=True)
 
