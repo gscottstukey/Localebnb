@@ -1,15 +1,15 @@
-# [localeBnB](http://github.com/gscottstukey/localeBnB): AirBnB Contexual Recommendation App
+# [Localebnb](http://github.com/gscottstukey/Localebnb): Airbnb Contexual Recommendation App
 
 
 ### G Scott Stukey, Zipfian Academy, April 2015 - July 2015
 
 
 ## Overview
-The motivation for my project stems from my frustrations with AirBnB's search functionality while booking in Montreal.  I knew that I wanted to stay in an artsy neighborhood & away from touristy areas.  While I could filter by neighborhood, I had no idea what neighborhoods met my criteria!
+The motivation for my project stems from my frustrations with Airbnb's search functionality while booking in Montreal.  I knew that I wanted to stay in an artsy neighborhood & away from touristy areas.  While I could filter by neighborhood, I had no idea what neighborhoods met my criteria!
 
-localeBnB aims to be a contextual recommender for AirBnB.
+Localebnb aims to be a contextual recommender for Airbnb.
 
-Using neighborhood guides put together for NYC & SF, I built an app that predicts the whether the neighborhood has a specified trait, and use that information to score & sort the search results provided by AirBnB.
+Using neighborhood guides put together for NYC & SF, I built an app that predicts the whether the neighborhood has a specified trait, and use that information to score & sort the search results provided by Airbnb.
 
 
 ##How to Use
@@ -17,13 +17,13 @@ TBD
 
 
 ## Dataset
-I scraped 4 types of pages across AirBnB for data:
+I scraped 4 types of pages across Airbnb for data:
 * Search Result Pages (e.g. https://www.airbnb.com/s/Portland--OR--United-States?checkin=09%2F18%2F2015&checkout=09%2F21%2F2015)
 * Listing Pages (e.g. https://www.airbnb.com/rooms/14584)
 * [City Guides](https://www.airbnb.com/locations) (e.g. https://www.airbnb.com/locations/san-francisco)
 * Neighborhood Guides (https://www.airbnb.com/locations/san-francisco/duboce-triangle)
 
-I mapped listings to neighborhoods & neighborhoods to traits to come up with my labeled dataset (listings -> traits). I then cleaned up the description using NLP techniques, vectorized the description using TF-IDF, and used a Naive Bayes model on the vectorized description to make the predictions. Interestingly enough, this methodology ourperformed RandomForests & GradientBoostedTrees against the same TF-IDF data, which might denote overfitting on the part of the tree-based model. 
+I mapped listings to neighborhoods & neighborhoods to traits to come up with my labeled dataset (listings -> traits). I then cleaned up the description using NLP techniques, vectorized the description using TF-IDF, and used a Naive Bayes model on the vectorized description to make the predictions. Interestingly enough, this methodology ourperformed Random Forests & Gradient Boosted Trees against the same TF-IDF data, which might denote overfitting on the part of the tree-based model. 
 
 I also ran a Word2Vec model against the cleaned description & the neighborhood, howerver due to the size of my corpus, as well as the attributes I was trying to model, this data proved to not be of high value to me.
 
@@ -32,15 +32,15 @@ I also ran a Word2Vec model against the cleaned description & the neighborhood, 
 
 There are many applications for this data & methodology.
 
-First, for the business & user, is the inclusion of additional context into the search result & direct business outcomes derived from the added relevence. Under an assumption of users having scroll fatigue & page fatigue, surfacing the most relevent searches earlier could drive incremental rentals. In addition, all things equal this would likely increase a user's satisfaction with the AirBnB app.
+First, for the business & user, is the inclusion of additional context into the search result & direct business outcomes derived from the added relevence. Under an assumption of users having scroll fatigue & page fatigue, surfacing the most relevent searches earlier could drive incremental rentals. In addition, all things equal this would likely increase a user's satisfaction with the Airbnb app.
 
 note: the above would need to be tested against existing systems, as the potential negatives may include the increase of options (i.e. the paradox of choice) and/or the contextualized search lowers the costs of the listings that people book at.
 
-Second would be for the content team, who could leverage a neighborhood model to help create content for '2nd-tier cities' (i.e. cities without a neighborhood guide), as well as new cities that AirBnB expands into.  They could use this model to create content, or give them some initial content to work with.
+Second would be for the content team, who could leverage a neighborhood model to help create content for '2nd-tier cities' (i.e. cities without a neighborhood guide), as well as new cities that Airbnb expands into.  They could use this model to create content, or give them some initial content to work with.
 
 Thirdly, as a lister resource, provide suggestions on key words in the listing, and provide recommendations on alternatives that might have been shown to drive higher booking rates. For (a contrived) example, stating an "artisanal coffee shop" is nearby may drive higher bookings than if a "hipster coffee shop" is near, assuming that "artisanal" shows up in the set of similar words to "hipster". The counter argument may be that this would make listings more homogenous, an assumed negative to people.
 
-Word2Vec Bonus: I'd be excited to see what Word2Vec & Doc2Vec could do with AirBnB's description & comment corpus.  Imagine LabeledSenteces() with labels of the neighborhood, listing_id, city, etc. AirBnB could find listing similarities across neighborhoods, cities, etc. Of interest might be flags for whether the listing is a "successful" listing (by whatever definition of "successful" AirBnB might want to use). AirBnB could find word flags that are most-similar to successful (& unsucessful) listings.  They might offer paid services for active users who are deemed unsuccessful, to improve their listing description based on successful words across AirBnb, as well as words successful for the listing's neighborhood. 
+Word2Vec Bonus: I'd be excited to see what Word2Vec & Doc2Vec could do with Airbnb's description & comment corpus.  Imagine LabeledSenteces() with labels of the neighborhood, listing_id, city, etc. Airbnb could find listing similarities across neighborhoods, cities, etc. Of interest might be flags for whether the listing is a "successful" listing (by whatever definition of "successful" Airbnb might want to use). Airbnb could find word flags that are most-similar to successful (& unsucessful) listings.  They might offer paid services for active users who are deemed unsuccessful, to improve their listing description based on successful words across Airbnb, as well as words successful for the listing's neighborhood. 
 
 
 ## Potential Next Steps
@@ -74,9 +74,9 @@ Word2Vec Bonus: I'd be excited to see what Word2Vec & Doc2Vec could do with AirB
 
 Also, [Galvanize (a.k.a. Zipfian Academy)](http://www.zipfianacademy.com/) for an amazing education. 
 
-A special thank you (& apology) to AirBnB, whose amazing service was an inspiration for this project. I hope you are inspired by this project enough to include this functionality in your search
+A special thank you (& apology) to Airbnb, whose amazing service was an inspiration for this project. I hope you are inspired by this project enough to include this functionality in your search
 
 ## Glossary of Terms
 * [TF-IDF aka Term Frequency - Inverse Document Frequency](http://en.wikipedia.org/wiki/Tf%E2%80%93idf)
 * [Naive-Bayes Classification](https://en.wikipedia.org/wiki/Naive_Bayes_classifier)
-* [Word2Vec](http://code.google.com/p/word2vec/) - I *heartemoji* Word2Vec
+* [Word2Vec](http://code.google.com/p/word2vec/) - I *::heartemoji::* Word2Vec
