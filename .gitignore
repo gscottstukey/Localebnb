@@ -1,0 +1,4 @@
+_internal/
+libs/.ipynb_checkpoints*
+other/*
+*.pyc
