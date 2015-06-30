@@ -2,7 +2,7 @@
 
 ### G Scott Stukey, Zipfian Academy, April 2015 - July 2015
 
-![](https://github.com/gscottstukey/localebnb/static/img/presentation_title.jpg)
+![](/static/img/presentation_title.jpg)
 
 
 ## Overview
@@ -15,7 +15,7 @@ Localebnb aims to be that contextual recommender for Airbnb.
 
 Using Airbnb listing descriptions (features) + Airbnb's neighborhood guides for traits (target ), I built an app that predicts whether a listing is in a neighborhood with a specified trait, and then I use that information to score & re-sort the default search results provided by Airbnb.
 
-![](https://github.com/gscottstukey/localebnb/static/img/presentation_solution.jpg)
+![](/static/img/presentation_solution.jpg)
 
 ##How to Use
 
@@ -29,7 +29,7 @@ Using Airbnb listing descriptions (features) + Airbnb's neighborhood guides for 
 
 ## Dataset
 
-![](https://github.com/gscottstukey/localebnb/static/img/presentation_methodology.jpg)
+![](/img/presentation_methodology.jpg)
 
 I scraped 4 types of pages across Airbnb for data:
 * Search Result Pages (e.g. https://www.airbnb.com/s/Portland--OR--United-States?checkin=09%2F18%2F2015&checkout=09%2F21%2F2015)
