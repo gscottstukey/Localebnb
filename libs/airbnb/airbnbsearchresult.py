@@ -63,7 +63,7 @@ class AirBnBSearchResult(object):
             self.price_max = params['price_max']
 
 
-    def scrape_all_results(self, start_page=1, end_page=1, insert_into_db = True, pause_between_pages=1.0):
+    def scrape_all_results(self, start_page=1, end_page=1, insert_into_db=True, pause_between_pages=1.0):
         """
         Scrapes multiple pages of a search result info from AirBnB
         Runs scrape_from_web() on the currently loaded params,
@@ -115,11 +115,11 @@ class AirBnBSearchResult(object):
             self.d = {'content':self.r.content,
                  'pickle': pkl,
                  'time': time.time(),
-                 'dt':datetime.datetime.utcnow(),
+                 'dt': datetime.datetime.utcnow(),
                  'city': self.city,
                  'state': self.state,
                  'country': self.country,
-                 'params':url_params,
+                 'params': url_params,
                  'requests_meta':{
                      'status_code': self.r.status_code,
                      'is_redirect': self.r.is_redirect,
@@ -154,13 +154,12 @@ class AirBnBSearchResult(object):
         if self.r.status_code == 200:
             self.d = {'content':self.r.content,
                  'time': time.time(),
-                 'dt':datetime.datetime.utcnow(),
+                 'dt': datetime.datetime.utcnow(),
                  'city': self.city,
                  'state': self.state,
                  'country': self.country,
-                 'params':url_params,
+                 'params': url_params,
                  'url': self.r.url}
-
 
     def pull_one_from_db(self):
         """
@@ -171,13 +170,12 @@ class AirBnBSearchResult(object):
         INPUT: None
         OUTPUT: None
         """
-        self.d = self.coll.find_one({'city':self.city,
-                            'state':self.state,
-                            'country':self.country,
-                            'params.checkin':self.checkin})
+        self.d = self.coll.find_one({'city': self.city,
+                                     'state': self.state,
+                                     'country': self.country,
+                                     'params.checkin': self.checkin})
 
         self.r = pickle.loads(self.d['pickle'])
-
 
     def pull_one_from_db_cached(self, city):
         """
@@ -189,12 +187,11 @@ class AirBnBSearchResult(object):
         OUTPUT: None
         """
         if city == "New-York":
-            self.d = self.coll.find_one({'_id':ObjectId("557f158e0540ac02f7fc9b63")})
+            self.d = self.coll.find_one({'_id': ObjectId("557f158e0540ac02f7fc9b63")})
         else:
-            self.d = self.coll.find_one({'_id':ObjectId("557f07ed0540ac02f7fc916d")})
+            self.d = self.coll.find_one({'_id': ObjectId("557f07ed0540ac02f7fc916d")})
 
         self.r = pickle.loads(self.d['pickle'])
-
 
     def extract_listing_ids(self):
         """
@@ -245,11 +242,11 @@ class AirBnBSearchResult(object):
             else:
                 cur_data['thumbnail_price'] = "n/a"
 
-            if listing.find("div", {'itemprop':"description"}):
-                if listing.find("div", {'itemprop':"description"}).find('a'):
-                    tmp = listing.find("div", {'itemprop':"description"}).find('a').get_text()
+            if listing.find("div", {'itemprop': "description"}):
+                if listing.find("div", {'itemprop': "description"}).find('a'):
+                    tmp = listing.find("div", {'itemprop': "description"}).find('a').get_text()
                     if tmp.find(u'\xb7') != -1:
-                        tmp=tmp[:tmp.find(u'\xb7')]
+                        tmp = tmp[:tmp.find(u'\xb7')]
                     cur_data['listing_type'] = tmp
                 else:
                     cur_data['listing_type'] = "not available"
@@ -271,5 +268,4 @@ class AirBnBSearchResult(object):
         """
 
         self.coll.insert(self.d)
-
 

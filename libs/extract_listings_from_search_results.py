@@ -10,7 +10,6 @@ from bs4 import BeautifulSoup
 import pickle
 from pymongo import MongoClient
 
-
 DB_NAME = 'airbnb'
 SEARCH_COLL_NAME = 'search'
 LISTING_COLL_NAME = 'listings'
@@ -23,7 +22,7 @@ def main():
     listing_coll = db[LISTING_COLL_NAME]
 
     # loop through all of the search results
-    for x in search_coll.find({},{'pickle':1}):
+    for x in search_coll.find({}, {'pickle': 1}):
         r = pickle.loads(x['pickle'])
         soup = BeautifulSoup(r.content)
 
@@ -31,14 +30,14 @@ def main():
         for listing in soup.find_all("div", {"class": "listing"}):
             try:
                 listing_id = listing['data-id']
-                if not listing_coll.find_one({'_id':listing_id}):
-                    listing_coll.insert({'_id':listing_id})
+                if not listing_coll.find_one({'_id': listing_id}):
+                    listing_coll.insert({'_id': listing_id})
                     print "SUCCESS: Added %s to database" % listing_id
                 else:
                     "DUPLICATE: Already added %s to database" % listing_id
             except:
-                "ERROR: No listings" 
+                "ERROR: No listings"
 
 
-if __name__=="__main__":
+if __name__ == "__main__":
     main()

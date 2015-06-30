@@ -12,12 +12,13 @@ import string
 import re
 from nltk.stem.wordnet import WordNetLemmatizer
 
+
 class AirBnBListing(object):
     """
-    Initializes an AirBnBListing object 
+    Initializes an AirBnBListing object
     This allows you to scrape listings or retrieve listings from MongoDB
 
-    INPUT: 
+    INPUT:
     - db_name (str): 'airbnb' or 'airbnb_test'
     - coll_name (str): 'listings'
     """
@@ -29,17 +30,16 @@ class AirBnBListing(object):
         self.db = client[db_name]
         self.coll = self.db[coll_name]
 
-        self.listing_id=""
+        self.listing_id = ""
         self.url = ""
         self.r = None
         self.d = {}
-
 
     def scrape_from_web(self, listing_id):
         '''
         Scrapes a single listing's info from AirBnB
 
-        INPUT: 
+        INPUT:
         - listing_id (int or str): the id of the listing you're trying to scrape
         OUTPUT: None
         '''
@@ -49,27 +49,26 @@ class AirBnBListing(object):
         self.r = requests.get(self.url)
         pkl = pickle.dumps(self.r)
         self.d = {'_id': self.listing_id,
-                 'url': self.url,
-                 'content':self.r.content,
-                 'pickle': pkl,
-                 'time': time.time(),
-                 'dt':datetime.datetime.utcnow(),
-                 'requests_meta':{
+                  'url': self.url,
+                  'content': self.r.content,
+                  'pickle': pkl,
+                  'time': time.time(),
+                  'dt': datetime.datetime.utcnow(),
+                  'requests_meta': {
                      'status_code': self.r.status_code,
                      'is_redirect': self.r.is_redirect,
                      'is_ok': self.r.ok,
                      'raise_for_status': self.r.raise_for_status(),
                      'reason': self.r.reason
                      }
-                 }
-
+                  }
 
     def scrape_from_web_for_app(self, listing_id):
         '''
         Scrapes a single listing's info from AirBnB
         note: specific for the production instance of the app
 
-        INPUT: 
+        INPUT:
         - listing_id (int or str): the id of the listing you're trying to scrape
         OUTPUT: None
         '''
@@ -78,39 +77,38 @@ class AirBnBListing(object):
         self.url = self.BASE_ROOM_URL + self.listing_id
         self.r = requests.get(self.url)
         self.d = {'_id': self.listing_id,
-                 'url': self.url,
-                 'content':self.r.content,
-                 'time': time.time(),
-                 'dt':datetime.datetime.utcnow(),
-                 }
+                  'url': self.url,
+                  'content': self.r.content,
+                  'time': time.time(),
+                  'dt': datetime.datetime.utcnow(),
+                  }
 
     def pull_from_db(self, listing_id):
         '''
         Pulls a previously scraped listing's data from the MongoDB collection
 
-        INPUT: 
+        INPUT:
         - listing_id (int or str): the id of the listing you're trying to pull
         OUTPUT: None
         '''
-        listing = self.coll.find_one({'_id':listing_id})
+        listing = self.coll.find_one({'_id': listing_id})
 
         self.listing_id = listing_id
         self.url = listing['url']
         self.r = pickle.loads(listing['pickle'])
         self.d = listing
 
-
     def pull_from_db_cached(self, listing_id):
         '''
         Pulls a previously scraped listing's data from the MongoDB collection
         Used for any listing after the production db crashed
 
-        INPUT: 
+        INPUT:
         - listing_id (int or str): the id of the listing you're trying to pull
         OUTPUT: None
         '''
         listing_id = str(listing_id)
-        listing = self.coll.find_one({'_id':listing_id})
+        listing = self.coll.find_one({'_id': listing_id})
 
         self.listing_id = listing_id
         # self.url = listing['url']
@@ -123,7 +121,7 @@ class AirBnBListing(object):
         - If the listing does not exist, it gets inserted
         - If the listing exists, the insertion depends on if we wish to overwrite
 
-        INPUT: 
+        INPUT:
         - overwrite (bool): whether to overwrite if the listing already exists
         OUTPUT:
         - bool: 
@@ -134,18 +132,17 @@ class AirBnBListing(object):
             self.coll.insert(self.d)
             return True
         elif overwrite:
-            self.coll.update({'_id':self.listing_id},{'$set':self.d})
+            self.coll.update({'_id': self.listing_id}, {'$set': self.d})
             return True
         else:
             return False
-
 
     def scrape_and_insert(self, listing_id, overwrite=False):
         '''
         Runs scrape_from_web() & insert_into_coll() with parameters provided
         NOTE: this method does NOT return what insert_into_coll returns
 
-        INPUT: 
+        INPUT:
         - listing_id (int or str): the id of the listing you're trying to pull
         - overwrite (bool): whether to overwrite if the listing already exists
         OUTPUT: None
@@ -153,15 +150,13 @@ class AirBnBListing(object):
         self.scrape_from_web(listing_id=listing_id)
         self.insert_into_coll(overwrite=overwrite)
 
-
-
     def is_in_collection(self, listing_id=None):
         '''
         Checks to see if the current listing's data is in the MongoDB collection
         NOTE: this method is only useful in conjunction with scrape_from_web()
 
-        INPUT: 
-        - listing_id (None or int or str): 
+        INPUT:
+        - listing_id (None or int or str):
           * the id of the listing you're trying to pull
           * if None (default), uses self.listing_id
         OUTPUT: None
@@ -170,8 +165,7 @@ class AirBnBListing(object):
             listing_id = self.listing_id
         else:
             listing_id = str(listing_id)
-        return bool(self.coll.find_one({'_id':listing_id}))
-
+        return bool(self.coll.find_one({'_id': listing_id}))
 
     def is_other_in_collection(self, listing_id):
         '''
@@ -186,7 +180,7 @@ class AirBnBListing(object):
         INPUT: None
         OUTPUT: None
         '''
-        return bool(self.coll.find_one({'_id':listing_id}))
+        return bool(self.coll.find_one({'_id': listing_id}))
 
     def _lemmatize(self, s):
 
@@ -199,15 +193,15 @@ class AirBnBListing(object):
         '''
         Helper Function to expand contractions:
 
-        INPUT: 
+        INPUT:
         - s (str): raw description text
         OUTPUT:
         - str: the text with the contractions expanded
         '''
-        #edited from
+        # edited from
         # http://stackoverflow.com/questions/19790188/expanding-english-language-contractions-in-python
 
-        contractions_dict = { 
+        contractions_dict = {
             "ain't": "am not",
             "aren't": "are not",
             "can't": "cannot",
@@ -333,17 +327,16 @@ class AirBnBListing(object):
             return contractions_dict[match.group(0)]
         return contractions_re.sub(replace, s)
 
-
     def _clean_description(self, d):
         '''
         Cleans up an AirBnB description as defined by:
-            soup.find('div', {'class':'row description'}) \
-            .find('div', {'class':'expandable-content expandable-content-long'}) \
+            soup.find('div', {'class':'row description'}) /
+            .find('div', {'class':'expandable-content expandable-content-long'}) /
             .get_text()
         where soup is the BeautifulSoup of the page content
 
-        INPUT: 
-        - d (str): see above for how d is defined 
+        INPUT:
+        - d (str): see above for how d is defined
         OUTPUT:
         - str: returns the cleaned up string
         '''
@@ -353,7 +346,7 @@ class AirBnBListing(object):
         d = d.replace('\nInteraction with Guests\n', "", 1)
         d = d.replace('\nThe Neighbourhood\n', "", 1)    # CA specific
         d = d.replace('\nThe Neighborhood\n', "", 1)    # US specific
-        d = d.replace('\nGetting Around\n', "", 1)   
+        d = d.replace('\nGetting Around\n', "", 1)
         d = d.replace('\nOther Things to Note\n', "", 1)
 
         # convert the string to lowercase
@@ -361,18 +354,17 @@ class AirBnBListing(object):
         # expand all contractions
         d = self._expand_contractions(d)
         # remove all non words
-        d = re.sub("[^a-zA-Z]"," ", d) 
+        d = re.sub("[^a-zA-Z]"," ", d)
         # remove punctuation
         # d = re.compile('[%s]' % re.escape(string.punctuation)).sub(' ', d)
         # lemmatize
         d = self._lemmatize(d)
         # remove line breaks
-        d = d.replace('\n', " ") 
-        # remove multiple spaces   
-        d = ' '.join(d.split()) 
+        d = d.replace('\n', " ")
+        # remove multiple spaces
+        d = ' '.join(d.split())
 
         return d
-
 
     def extract_features(self):
         '''
@@ -380,38 +372,38 @@ class AirBnBListing(object):
 
         INPUT: None
         OUTPUT:
-        - dict: the dictionary of the predefined features extracted 
+        - dict: the dictionary of the predefined features extracted
         '''
         features = {}
 
         soup = BeautifulSoup(self.r.content)
 
         try:
-            listing_name = soup.find('div', {'class':"rich-toggle wish_list_button"})['data-name']
+            listing_name = soup.find('div', {'class': "rich-toggle wish_list_button"})['data-name']
             features['listing_name'] = listing_name
         except TypeError:
             pass
 
         try:
-            address = soup.find('div', {'class':"rich-toggle wish_list_button"})['data-address']
+            address = soup.find('div', {'class': "rich-toggle wish_list_button"})['data-address']
             features['address'] = address
         except TypeError:
             pass
 
         try:
-            num_saved = soup.find('div', {'class':"rich-toggle wish_list_button"})['title']
+            num_saved = soup.find('div', {'class': "rich-toggle wish_list_button"})['title']
             features['num_saved'] = num_saved
         except (TypeError, KeyError):
             pass
 
         try:
-            headline = soup.find('meta', {'property':"og:description"})['content']
+            headline = soup.find('meta', {'property': "og:description"})['content']
             features['headline'] = headline
         except TypeError:
             pass
 
         try:
-            description_raw = soup.find('div', {'class':'row description'}).find('div', {'class':'expandable-content expandable-content-long'}).get_text()
+            description_raw = soup.find('div', {'class': 'row description'}).find('div', {'class': 'expandable-content expandable-content-long'}).get_text()
             features['description_raw'] = description_raw
             features['description_clean'] = self._clean_description(description_raw)
         except AttributeError:
@@ -430,13 +422,12 @@ class AirBnBListing(object):
             pass
 
         try:
-            hood = soup.find('div',{'id':'neighborhood-seo-link'}).h3.a.get_text().strip()
+            hood = soup.find('div', {'id': 'neighborhood-seo-link'}).h3.a.get_text().strip()
         except (AttributeError):
             hood = "N/A"
         features['neighborhood'] = hood
 
         return features
-
 
     def extract_clean_description(self):
         '''
@@ -444,15 +435,15 @@ class AirBnBListing(object):
 
         INPUT: None
         OUTPUT:
-        - str: 
-          * if we're able to clean up the string, returns the cleaned description
+        - str:
+          * if we're able to clean up the string, returns cleaned description
           * if we error out, we return an empty string
         '''
 
         soup = BeautifulSoup(self.r.content)
 
         try:
-            description_raw = soup.find('div', {'class':'row description'}).find('div', {'class':'expandable-content expandable-content-long'}).get_text()
+            description_raw = soup.find('div', {'class': 'row description'}).find('div', {'class': 'expandable-content expandable-content-long'}).get_text()
             return self._clean_description(description_raw)
         except:
             return ""
@@ -464,8 +455,8 @@ class AirBnBListing(object):
 
         INPUT: None
         OUTPUT:
-        - str: 
-          * if we're able to clean up the string, returns the cleaned description
+        - str:
+          * if we're able to clean up the string, returns cleaned description
           * if we error out, we return an empty string
         '''
 
@@ -480,17 +471,16 @@ class AirBnBListing(object):
         Adds new features to the currently loaded listing's data
         Note: The listing must already exist in the MongoDB collection
 
-        INPUT: 
+        INPUT:
         - new_features (dict): a dictionary of new features to add the the listing
         OUTPUT: None
         '''
-        # self.coll.update({'_id':self.listing_id},new_features)
-        self.coll.update({'_id':self.listing_id},{'$set:':new_features})
-
+        # self.coll.update({'_id': self.listing_id}, new_features)
+        self.coll.update({'_id': self.listing_id}, {'$set:': new_features})
 
     def extract_and_add_features(self):
         '''
-        Runs extract_features() on the currently loaded listing's data, 
+        Runs extract_features() on the currently loaded listing's data,
         and tthen runs add_features() to add them
         Note: The listing must already exist in the MongoDB collection
 
@@ -501,6 +491,5 @@ class AirBnBListing(object):
         if new_features != {}:
             self.add_features(new_features=new_features)
         else:
-            error_warning = {'error':1, 'message':'NO FEATURES EXTRACTED'}
+            error_warning = {'error': 1, 'message': 'NO FEATURES EXTRACTED'}
             self.add_features(new_features=error_warning)
-

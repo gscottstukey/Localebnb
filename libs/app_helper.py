@@ -4,7 +4,12 @@ This file contains helper functions for the localeBnB web app
 
 import numpy as np
 
-def initialize_rank_scores(head=None, tail_high=5, tail_low=2, tail_num=16, log_score=True):
+
+def initialize_rank_scores(head=None,
+                           tail_high=5,
+                           tail_low=2,
+                           tail_num=16,
+                           log_score=True):
     '''
     Initializes scores for the listing ranks; 
     Combines a custom head and combines it with a linear tail function
@@ -25,16 +30,16 @@ def initialize_rank_scores(head=None, tail_high=5, tail_low=2, tail_num=16, log_
     - 1d numpy array: an array of length len(head) + tail_num.
     '''
 
-    if head!=None:
+    if head is not None:
         head_scores = head
     else:
-        MOZ_DATA = np.array([25, 15, 11, 8, 6.5])    
+        MOZ_DATA = np.array([25, 15, 11, 8, 6.5])
         head_scores = MOZ_DATA
 
     tail_scores = np.linspace(tail_high, tail_low, tail_num)
     
     scores = np.append(head_scores, tail_scores)
     if log_score:
-        scores = np.log(scores)    # Take the ln of the score  
+        scores = np.log(scores)    # Take the ln of the score
 
     return scores

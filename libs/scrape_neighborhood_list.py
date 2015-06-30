@@ -17,11 +17,12 @@ DEPENDENCIES:
 
 POTENTIAL ISSUES:
 1) city_id:
-    * city_id is unique to this project; it is not based on AirBnB's city ids 
+    * city_id is unique to this project; it is not based on AirBnB's city ids
 2) neighborhood_id:
-    * arbitrarily assigns neighborhood_ids based on the order they were scraped 
+    * arbitrarily assigns neighborhood_ids based on the order they were scraped
     * if content changes, then all dependencies are impacted
-    * if were to recreate, AirBnB's neighborhood_ids on the scrape and use that field
+    * if I were to recreate, 
+        AirBnB's neighborhood_ids on the scrape and use that field
 
 NOTES: make sure mongod running. use `sudo mongod` in terminal
 """
@@ -34,25 +35,26 @@ NEIGHBORHOOD_URL = 'https://www.airbnb.com/locations/'
 CITY_FILEPATH = '../data/city_list.csv'
 NEIGHBORHOOD_OUTPUT = '../data/neighborhood_list.csv'
 
+
 def main():
     df = pd.read_csv(CITY_FILEPATH)
     city_tuples = [(city_id, city.lower()) for city_id, city in zip(df['city_id'], df['city'])]
-    
+
     neighborhoods = []
 
     for city_id, city in city_tuples:
         r = requests.get(NEIGHBORHOOD_URL + city)
         soup = BeautifulSoup(r.content)
-        neighborhood_list_raw = soup.find('div', {'class':'neighborhood-list'}).find_all('a')[1:]
+        neighborhood_list_raw = soup.find('div', {'class': 'neighborhood-list'}).find_all('a')[1:]
         for hood in neighborhood_list_raw:
             hood_name = hood.get_text()
             hood_url = hood['href']
             neighborhoods.append((hood_name, hood_url, city_id, city))
 
-    hood_df = pd.DataFrame(neighborhoods, columns=["neighborhood", "neighborhood_url", "city_id", "city"])
+    select_cols = ["neighborhood", "neighborhood_url", "city_id", "city"]
+    hood_df = pd.DataFrame(neighborhoods, columns=select_cols)
     hood_df.to_csv(NEIGHBORHOOD_OUTPUT, index=True, index_label='neighborhood_id')
 
 
-if __name__=="__main__":
+if __name__ == "__main__":
     main()
-

@@ -12,9 +12,10 @@ from airbnb.airbnbneighborhood import AirBnBNeighborhood
 DB_NAME = 'airbnb'
 COLL_NAME = 'neighborhoods'
 
+
 def main():
-    air_hood = AirBnBNeighborhood(db_name = DB_NAME, coll_name = COLL_NAME)
-    hoods_dict = list(air_hood.coll.find({},{'_id':1}))
+    air_hood = AirBnBNeighborhood(db_name=DB_NAME, coll_name=COLL_NAME)
+    hoods_dict = list(air_hood.coll.find({}, {'_id': 1}))
 
     for hood in hoods_dict:
         hood_id = hood['_id']
