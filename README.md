@@ -2,8 +2,11 @@
 
 ### G Scott Stukey, Zipfian Academy, April 2015 - July 2015
 
+![](/static/img/presentation_title.jpg)
+
 
 ## Overview
+
 The motivation was: When booking a private residence, how do you find the perfect neighborhood?
 
 It stems from my personal frustrations with Airbnb's search functionality while booking in Montreal.  I knew that I wanted to stay in an trendy neighborhood, but away from tourists & nightlife.  While I could search & filter Airbnb's search results by neighborhood, I had no idea what neighborhoods met my criteria!
@@ -12,8 +15,10 @@ Localebnb aims to be that contextual recommender for Airbnb.
 
 Using Airbnb listing descriptions (features) + Airbnb's neighborhood guides for traits (target ), I built an app that predicts whether a listing is in a neighborhood with a specified trait, and then I use that information to score & re-sort the default search results provided by Airbnb.
 
+![](/static/img/presentation_solution.jpg)
 
 ##How to Use
+
 *Note: it is best to use this app on desktop with a large window*
 * Go to the [Localebnb app](http://localebnb.co)
 * Enter in your search criteria (city, dates, guests), as well as neighborhood trait preferences ('is artsy, 'has shopping', etc)
@@ -23,6 +28,8 @@ Using Airbnb listing descriptions (features) + Airbnb's neighborhood guides for 
 
 
 ## Dataset
+
+![](/static/img/presentation_methodology.jpg)
 I scraped 4 types of pages across Airbnb for data:
 * Search Result Pages (e.g. https://www.airbnb.com/s/Portland--OR--United-States?checkin=09%2F18%2F2015&checkout=09%2F21%2F2015)
 * ~4000 Listing Pages (e.g. https://www.airbnb.com/rooms/14584)
