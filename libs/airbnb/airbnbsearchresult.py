@@ -8,6 +8,7 @@ from bs4 import BeautifulSoup
 from pymongo import MongoClient
 import time
 import pickle
+from bson.objectid import ObjectId
 
 
 class AirBnBSearchResult(object):
@@ -131,6 +132,35 @@ class AirBnBSearchResult(object):
 
         if insert_into_db: self.insert_into_coll()
 
+    def scrape_from_web_for_app(self):
+        """
+        Scrapes a search result's info from AirBnB
+        note: requires set_params() to have been run
+        note: specific for the production instance of the app
+
+        INPUT: None
+        OUTPUT: None
+        """
+
+        city_url = '%s--%s--%s' % (self.city, self.state, self.country)
+
+        url_params = {'checkin': self.checkin, 
+              'checkout': self.checkout,
+              'guests': self.guests, 
+              'price_max': self.price_max}
+
+        self.r = requests.get(self.SEARCH_RESULT_URL + city_url, params=url_params)
+
+        if self.r.status_code == 200:
+            self.d = {'content':self.r.content,
+                 'time': time.time(),
+                 'dt':datetime.datetime.utcnow(),
+                 'city': self.city,
+                 'state': self.state,
+                 'country': self.country,
+                 'params':url_params,
+                 'url': self.r.url}
+
 
     def pull_one_from_db(self):
         """
@@ -145,6 +175,23 @@ class AirBnBSearchResult(object):
                             'state':self.state,
                             'country':self.country,
                             'params.checkin':self.checkin})
+
+        self.r = pickle.loads(self.d['pickle'])
+
+
+    def pull_one_from_db_cached(self, city):
+        """
+        Pulls a previously scraped search result data from the MongoDB collection
+        The query is based off of the city, state, country & checkin information
+        Note: requires the user to have run set_params()
+
+        INPUT: None
+        OUTPUT: None
+        """
+        if city == "New-York":
+            self.d = self.coll.find_one({'_id':ObjectId("557f158e0540ac02f7fc9b63")})
+        else:
+            self.d = self.coll.find_one({'_id':ObjectId("557f07ed0540ac02f7fc916d")})
 
         self.r = pickle.loads(self.d['pickle'])
 

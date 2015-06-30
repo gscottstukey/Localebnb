@@ -78,7 +78,7 @@ def run_grid_search(X_doc, y, mnb, trait):
     return max_test_results_df.reset_index()
 
 
-def tiebreaker(mnb, max_test_results_df):
+def tiebreaker(mnb, max_test_results_df, X_doc, y):
     tiebreaker_df = max_test_results_df.copy()
     tiebreaker_df['final_score'] = 0
     for i in tiebreaker_df.index:
@@ -129,7 +129,7 @@ def main():
         max_test_results_df = run_grid_search(X_doc, y, mnb, trait)
         
         if len(max_test_results_df) > 1:
-            max_test_results_df = tiebreaker(mnb, max_test_results_df)
+            max_test_results_df = tiebreaker(mnb, max_test_results_df, X_doc, y)
         
         max_df = max_test_results_df['max_df'][0]
         max_features = max_test_results_df['max_features'][0]

@@ -80,6 +80,43 @@
         return _results;
       });
     },
+    
+    clickRefresh2: function(table, col, i) {
+      var type;
+      type = sortable.types.numeric;
+      
+      var newSortedDirection, row, rowArray, rowArrayObject, sorted, sortedDirection, tBody, ths, _i, _j, _k, _len, _len1, _len2, _ref, _results;
+      
+      newSortedDirection = 'descending';
+    
+      ths = col.parentNode.querySelectorAll('th');
+      for (_i = 0, _len = ths.length; _i < _len; _i++) {
+        th = ths[_i];
+        th.setAttribute('data-sorted', 'false');
+        th.removeAttribute('data-sorted-direction');
+      }
+      col.setAttribute('data-sorted', 'true');
+      col.setAttribute('data-sorted-direction', newSortedDirection);
+      tBody = table.tBodies[0];
+      rowArray = [];
+      _ref = tBody.rows;
+      for (_j = 0, _len1 = _ref.length; _j < _len1; _j++) {
+        row = _ref[_j];
+        rowArray.push([sortable.getNodeValue(row.cells[i]), row]);
+      }
+      if (sorted) {
+        rowArray.reverse();
+      } else {
+        rowArray.sort(type.compare);
+      }
+      _results = [];
+      for (_k = 0, _len2 = rowArray.length; _k < _len2; _k++) {
+        rowArrayObject = rowArray[_k];
+        _results.push(tBody.appendChild(rowArrayObject[1]));
+      }
+      return _results;
+    },
+
     getColumnType: function(table, i) {
       var row, text, _i, _len, _ref;
       _ref = table.tBodies[0].rows;

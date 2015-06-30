@@ -64,26 +64,6 @@ class AirBnBListing(object):
                  }
 
 
-    def scrape_from_web_for_app(self, listing_id):
-        '''
-        Scrapes a single listing's info from AirBnB
-        note: specific for the production instance of the app
-
-        INPUT: 
-        - listing_id (int or str): the id of the listing you're trying to scrape
-        OUTPUT: None
-        '''
-
-        self.listing_id = str(listing_id)    # ensure listing_id is a string
-        self.url = self.BASE_ROOM_URL + self.listing_id
-        self.r = requests.get(self.url)
-        self.d = {'_id': self.listing_id,
-                 'url': self.url,
-                 'content':self.r.content,
-                 'time': time.time(),
-                 'dt':datetime.datetime.utcnow(),
-                 }
-
     def pull_from_db(self, listing_id):
         '''
         Pulls a previously scraped listing's data from the MongoDB collection
@@ -103,13 +83,11 @@ class AirBnBListing(object):
     def pull_from_db_cached(self, listing_id):
         '''
         Pulls a previously scraped listing's data from the MongoDB collection
-        Used for any listing after the production db crashed
 
         INPUT: 
         - listing_id (int or str): the id of the listing you're trying to pull
         OUTPUT: None
         '''
-        listing_id = str(listing_id)
         listing = self.coll.find_one({'_id':listing_id})
 
         self.listing_id = listing_id
@@ -449,7 +427,7 @@ class AirBnBListing(object):
           * if we error out, we return an empty string
         '''
 
-        soup = BeautifulSoup(self.r.content)
+        self.d
 
         try:
             description_raw = soup.find('div', {'class':'row description'}).find('div', {'class':'expandable-content expandable-content-long'}).get_text()
@@ -457,10 +435,10 @@ class AirBnBListing(object):
         except:
             return ""
 
-    def extract_clean_description_cached(self):
+    def extract_clean_description_cahced(self):
         '''
         Extracts and returns the clean_description of the current listing
-        Used for any listing after the production db crashed
+        Based on grabbing the data from 
 
         INPUT: None
         OUTPUT:
@@ -470,7 +448,7 @@ class AirBnBListing(object):
         '''
 
         try:
-            description_raw = self.d['description_raw']
+            description_raw = soup.find('div', {'class':'row description'}).find('div', {'class':'expandable-content expandable-content-long'}).get_text()
             return self._clean_description(description_raw)
         except:
             return ""
