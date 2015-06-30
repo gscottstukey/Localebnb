@@ -29,7 +29,7 @@ Using Airbnb listing descriptions (features) + Airbnb's neighborhood guides for 
 
 ## Dataset
 
-![](/img/presentation_methodology.jpg)
+![](/static/img/presentation_methodology.jpg)
 
 I scraped 4 types of pages across Airbnb for data:
 * Search Result Pages (e.g. https://www.airbnb.com/s/Portland--OR--United-States?checkin=09%2F18%2F2015&checkout=09%2F21%2F2015)
