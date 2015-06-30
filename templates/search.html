@@ -5,7 +5,7 @@
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <!-- The above 3 meta tags *must* come first in the head; any other head content must come *after* these tags -->
-    <title>localeBnB - Search Results for {{city}}, {{state}}</title>
+    <title>Localebnb - Search Results for {{city}}, {{state}}</title>
 
     <!-- Bootstrap core CSS -->
     <link href="../static/css/bootstrap.min.css" rel="stylesheet">
@@ -23,8 +23,7 @@
       <script src="https://oss.maxcdn.com/respond/1.4.2/respond.min.js"></script>
     <![endif]-->
 
-    <!-- Sortable tables -->
-    <script src="../static/js/sortable.min.js"></script>
+
     <link href="../static/css/sortable-theme-boostrap-for-localebnb.css" rel="stylesheet">
 
     <!-- Mapbox -->
@@ -34,13 +33,16 @@
     <!-- Additional Styles -->
     <style>
       html, body {height: 100%;}
-      #map {position:inherit; height:500px; min-height: 100%; width:100%;}
+      body {min-height: 600px; max-height: 1400px}
+      #map {position:fixed; height:500px; width:400px;}
       #map-holder{height: 100%; min-height:100%;}
       
       .custom-popup .leaflet-popup-tip-container {
-        width:200px;
+        width:250px;
         height:200px;
+        min-width:250px;
         }
+
       .custom-popup .leaflet-popup-tip {
         border-left:15px solid transparent;
         border-right:15px solid transparent;
@@ -48,7 +50,12 @@
         }
       .custom-popup > img {margin-left: auto; margin-right: auto;}
 
-      .table-hover tbody tr:hover td {background: #499BC9; font-color:#ffffff;}
+      table > th {text-align: center;}
+      table #weights > th {color: #ffffff;}
+
+      .pink-background {display: block; background: #abcdef;}
+
+      /*.table-hover tbody tr:hover td {background: #499BC9; font-color:#ffffff;}*/
     </style>
 </head>
 
@@ -63,11 +70,11 @@
             <span class="icon-bar"></span>
             <span class="icon-bar"></span>
           </button>
-          <a class="navbar-brand" href="#">localeBnB</a>
+          <a class="navbar-brand" href="#">Localebnb</a>
         </div>
         <div id="navbar" class="navbar-collapse collapse">
           <ul class="nav navbar-nav">
-            <li><a href="/about">About</a></li>
+            <li><a href="http://www.github.com/gscottstukey/localebnb">About</a></li>
           </ul>
           <ul class="nav navbar-nav navbar-right">
             <li><a href="/contact">Contact</a></li>
@@ -77,52 +84,80 @@
     </nav>
     
     <div class="container" role="main">
-          <!-- <div class="col"> -->
-            <h3>Search Results for {{city}}, {{state}}:</h3>
-            <div class="col-md-6">
-              <table class="table table-hover" id="data" data-sortable>
-                <thead>
-                  <tr>
-                    <th data-field="rank" data-sortable="true">Rank</th>
-                    <th data-field="prev_rank"  data-sortable="true">Prev Rank</th>
-                    <th data-field="delta">&Delta;</th>
-                    <!--<th>Image</th>-->
-                    <th data-field="listing_name">Listing</th>
-                    <!-- <th data-field="room_type">Room_Type</th> -->
-                    <th data-field="price">Price</th>
-                    <!-- http://apps.timwhitlock.info/emoji/tables/unicode -->
-                    <th data-field="is_artsy">A</th>
-                    <th data-field="is_shopping" data-sortable="true">S</th>
-                    <th data-field="is_dining" data-sortable="true">D</th>
-                    <th data-field="is_nightlife" data-sortable="true">N</th>
-                  </tr>
-                </thead>
+      <div class="col-md-12">
+        <table class="table" id="weights" style="width:100%;">
+          <thead>
+            <tr style="background:inherit">
+            {% for trait in traits%}
+              <th style="text-align:center;">{{trait}}:
+                <label class="radio-inline">
+                  <select class="form-control trait-radio" name="{{trait}}Radio" id="{{trait}}Radio" style="width:100px">
+                  {% for weight in trait_weights[::-1]%}
+                    <option name="{{trait}}Radio"  value="{{weight['value']}}"{% if trait == "artsy" %}{% if weight['value']==artsy_weight %} selected="selected"{% endif %}{% endif %}{% if trait == "shopping" %}{% if weight['value']==shopping_weight %} selected="selected"{% endif %}{% endif %}{% if trait == "dining" %}{% if weight['value']==dining_weight %} selected="selected"{% endif %}{% endif %}{% if trait == "nightlife" %}{% if weight['value']==nightlife_weight %} selected="selected"{% endif %}{% endif %}>
+                    {{weight['label']}}
+                    </option>
+                  {% endfor %}
+                  </select>
+                </label>
+              </th>
+            {% endfor %}
+            </tr>
+          </thead>
+        </table>
+      </div>
+    <!-- Sortable tables -->
+    <script src="../static/js/sortable.js"></script>
 
-                {% for listing in sorted_listings%}
-                <tr>
-                  <td>{{"%02d" % listing_dict[listing]['position']}}<br><small><i>({{"%.2f" % listing_dict[listing]['score']}})</i></small></td>
-                  <td>{{"%02d" % listing_dict[listing]['default_position']}}<br><small><i>({{"%.2f" % listing_dict[listing]['default_score']}})</i></small></td>
-                  <td><span{%if listing_dict[listing]['default_position'] - listing_dict[listing]['position'] >0 %} class="label label-success"{% endif %}{%if listing_dict[listing]['default_position'] - listing_dict[listing]['position'] <0 %} class="label label-danger"{% endif %}>{{listing_dict[listing]['default_position'] - listing_dict[listing]['position']}}</span></td>
-                  <!--<td><img src={{listing_dict[listing]['thumbnail_img']}} height="100"></img></td>-->
-                  <td>{{listing_dict[listing]['blurb']}}<br><small><i>({{listing_dict[listing]['listing_type']}})</i></small></td>
-                  <!-- <td></td> -->
-                  <td>${{listing_dict[listing]['thumbnail_price']}}</td>
-                  <td>{{"%1d" % listing_dict[listing]['is_artsy']}}</td>
-                  <td>{{"%1d" % listing_dict[listing]['is_shopping']}}</td>
-                  <td>{{"%1d" % listing_dict[listing]['is_dining']}}</td>
-                  <td>{{"%1d" % listing_dict[listing]['is_nightlife']}}</td>
-                </tr>
-                {% endfor %}
-              </table>
+      <div class="col-md-12">
+        <div class="col-md-7">
+          <h3>Search Results for {{city}}, {{state}}:</h3>
+          <table class="table table-hover" id="data" data-sort-name="rank" data-sort-order="desc" data-sortable>
+            <thead>
+              <tr>
+                <th data-field="rank" data-sortable="true">Rank</th>
+                <th data-field="score" data-sortable="true" data-sorted="false">Score</th>
+                <th data-field="prev_rank"  data-sortable="true">Prev Rank</th>
+                <th data-field="prev_score" data-sortable="true" style="display:none;">Prev Score</th>
+                <th data-field="delta" data-sortable="true">&Delta;</th>
+                <!--<th>Image</th>-->
+                <th data-field="listing_name" data-sortable="true" style="min-width:150px">Listing</th>
+                <!-- <th data-field="room_type">Room_Type</th> -->
+                <th data-field="price" data-sortable="true">Price</th>
+                <!-- http://apps.timwhitlock.info/emoji/tables/unicode -->
+                <th data-field="is_artsy">A</th>
+                <th data-field="is_shopping" data-sortable="true">S</th>
+                <th data-field="is_dining" data-sortable="true">D</th>
+                <th data-field="is_nightlife" data-sortable="true">N</th>
+              </tr>
+            </thead>
+            {% for listing in sorted_listings%}
+              <tr data-id={{listing_dict[listing]['position']}} data-listing-id={{listing_dict[listing]['id']}}>
+                <td>{{listing_dict[listing]['position']}}</td>
+                <td><small><i>{{"%.2f" % listing_dict[listing]['score']}}</i></small></td>
+                <td>{{listing_dict[listing]['default_position']}}</td>
+                <td style="display:none;"><small><i>{{"%.2f" % listing_dict[listing]['default_score']}}</i></small></td>
+                <td>{% if listing_dict[listing]['default_position'] - listing_dict[listing]['position'] >0 %}<span class="label label-success">{{listing_dict[listing]['default_position'] - listing_dict[listing]['position']}}</span>{% endif %}{% if listing_dict[listing]['default_position'] - listing_dict[listing]['position'] <0 %}<span class="label label-danger">{{listing_dict[listing]['default_position'] - listing_dict[listing]['position']}}</span>{% endif %}{% if listing_dict[listing]['default_position'] - listing_dict[listing]['position']== 0 %}<span class="glyphicon glyphicon-minus" aria-hidden="true" style="color:lightgrey"></span>{% endif %}</td>
+                <!--<td><img src={{listing_dict[listing]['thumbnail_img']}} height="100"></img></td>-->
+                <td>{{listing_dict[listing]['blurb']}}</td>
+                <!-- <td></td> -->
+                <td>${{listing_dict[listing]['thumbnail_price']}}</td>
+                <td>{% if listing_dict[listing]['is_artsy'] == 1 %}<span class="glyphicon glyphicon-ok" aria-hidden="true" style="color:mediumseagreen"></span>{% endif %}{% if listing_dict[listing]['is_artsy'] != 1 %}<span class="glyphicon glyphicon-minus" aria-hidden="true" style="color:lightgrey"></span>{% endif %}</td>
+                <td>{% if listing_dict[listing]['is_shopping'] == 1 %}<span class="glyphicon glyphicon-ok" aria-hidden="true" style="color:mediumseagreen"></span>{% endif %}{% if listing_dict[listing]['is_shopping'] != 1 %}<span class="glyphicon glyphicon-minus" aria-hidden="true" style="color:lightgrey"></span>{% endif %}</td>
+                <td>{% if listing_dict[listing]['is_dining'] == 1 %}<span class="glyphicon glyphicon-ok" aria-hidden="true" style="color:mediumseagreen"></span>{% endif %}{% if listing_dict[listing]['is_dining'] != 1 %}<span class="glyphicon glyphicon-minus" aria-hidden="true" style="color:lightgrey"></span>{% endif %}</td>
+                <td>{% if listing_dict[listing]['is_nightlife'] == 1 %}<span class="glyphicon glyphicon-ok" aria-hidden="true" style="color:mediumseagreen"></span>{% endif %}{% if listing_dict[listing]['is_nightlife'] != 1 %}<span class="glyphicon glyphicon-minus" aria-hidden="true" style="color:lightgrey"></span>{% endif %}</td>
+              </tr>
+            {% endfor %}
+          </table>
+        </div>
+        
+        <div class="col-md-5">
+          <div id="map-holder">
+            <div id='map'>
             </div>
-            
-            <!-- </div> -->
-            <div class="col-md-6">
-              <div id="map-holder">
-                <div id='map'>
-                </div>
-              </div>
-            </div>
+          </div>
+        </div>
+      </div>
+
               <script>
                 // Provide your access token
                 L.mapbox.accessToken = 'pk.eyJ1IjoiZ3NzdHVrZXkiLCJhIjoiY2U0MWVmOWZjYmNkOTI0YTIxNjQ1YWE0MWQ4OGJmZjEifQ.CKmOi88GHFvNuCl4AFmwaA';
@@ -134,14 +169,14 @@
                 map.scrollWheelZoom.disable();
 
                 {% for listing in sorted_listings %}
-                var featureLayer{{listing_dict[listing]['position']}} = L.mapbox.featureLayer(
+                var featureLayer{{listing_dict[listing]['id']}} = L.mapbox.featureLayer(
                 {
                   type: 'Feature',
                   geometry: {type: 'Point',coordinates: [{{listing_dict[listing]['lng']}},{{listing_dict[listing]['lat']}}]},
-                  properties: {title: '{{listing_dict[listing]['blurb']}}', description: 'ID: {{listing_dict[listing]['id']}}<br><img class="center-block" src="{{listing_dict[listing]['thumbnail_img']}}" height="150"><a href="http://localhost:6969/listing/{{listing_dict[listing]['id']}}">more info</a>','marker-size': 'large', 'marker-symbol':'{{listing_dict[listing]['position']}}'}
+                  properties: {title: '{{listing_dict[listing]['blurb']}}<br><i><small>({{listing_dict[listing]['listing_type'].strip()}})</small></i>', description: 'ID: {{listing_dict[listing]['id']}}<br><img class="center-block" src="{{listing_dict[listing]['thumbnail_img']}}" height="150"><a href="http://localebnb.co/listing/{{listing_dict[listing]['id']}}">more info about trait predictions</a><br><a href="http://www.airbnb.com/rooms/{{listing_dict[listing]['id']}}">view on Airbnb</a>','marker-size': 'large', 'marker-symbol':'{{listing_dict[listing]['position']}}'}
                 }).addTo(map);
 
-                featureLayer{{listing_dict[listing]['position']}}.on('mouseover', function(e) {
+                featureLayer{{listing_dict[listing]['id']}}.on('mouseover', function(e) {
                     e.layer.openPopup();
                 });
                 {% endfor %}
@@ -156,12 +191,67 @@
                 </script>
 
                 <script>
+
+                function update_listing_score(default_score, is_artsy, is_shopping, is_dining, is_nightlife) {
+                  return (default_score + is_artsy * parseFloat($('#artsyRadio').val()) + is_shopping * parseFloat($('#shoppingRadio').val()) + is_dining * parseFloat($('#diningRadio').val()) + is_nightlife * parseFloat($('#nightlifeRadio').val()));
+                };
+
                 $(document).on('mouseenter', "tr", function () {
-                   // do stuff console.log($(data)[0].children[1]);
+                  var dataId = $(this).attr("data-listing-id");
+                  (eval('featureLayer' + dataId))._geojson['properties']['marker-color']="#ff5a5f";
+                  (eval('featureLayer' + dataId)).setGeoJSON((eval('featureLayer' + dataId))._geojson);
+                  (eval('featureLayer' + dataId)).openPopup();
                 }).on('mouseleave', "tr", function () {
-                    // do stuff
+                  var dataId = $(this).attr("data-listing-id");
+                  (eval('featureLayer' + dataId))._geojson['properties']['marker-color']="#7d7d7d";
+                  (eval('featureLayer' + dataId)).setGeoJSON((eval('featureLayer' + dataId))._geojson);
                 });
-                
+
+
+
+                $(document).on('mouseenter', "tr>td", function () {
+                  $(this).parent().css("background-color", "#ff5a5f");
+                  $(this).parent().css("color", "#ffffff");
+                }).on('mouseleave', "tr>td", function () {
+                  $(this).parent().css("background-color", 'inherit');
+                  $(this).parent().css("color", 'inherit');
+                });
+
+                $(".trait-radio").change(function() {
+                  // console.log($(this));
+                  {% for listing in sorted_listings%}
+                  var new_score = (update_listing_score({{listing_dict[listing]['default_score']}},{{listing_dict[listing]['is_artsy']}},{{listing_dict[listing]['is_shopping']}},{{listing_dict[listing]['is_dining']}},{{listing_dict[listing]['is_nightlife']}}));
+                  var cur_row = $('table#data tbody tr[data-listing-id="{{listing_dict[listing]['id']}}"]').children();
+                  cur_row[1].innerHTML = "<small><i>" +new_score.toFixed(2) + "</i></small>";
+                  {% endfor %}
+                  Sortable.clickRefresh2($('#data')[0], $('table#data thead th[data-field="score"]')[0], 1);
+                  for (var j = 0, row; row = $('#data tbody tr')[j]; j++) {
+                    row.children[0].innerHTML = j+1;
+                    var new_delta = row.children[2].innerText - row.children[0].innerText;
+                    
+                    if (new_delta > 0) {row.children[4].innerHTML = "<span class='label label-success'>" + new_delta + "</span>"};
+                    if (new_delta < 0) {row.children[4].innerHTML = "<span class='label label-danger'>" + new_delta + "</span>"};
+                    if (new_delta == 0) {row.children[4].innerHTML = "<span class='glyphicon glyphicon-minus' aria-hidden='true' style='color:lightgrey'></span>"};
+                     };
+                  {% for listing in sorted_listings %}
+                  for (var j = 0, row; row = $('#data tbody tr')[j]; j++) {
+                    if (row.children[2].innerText == {{listing_dict[listing]['default_position']}}) {
+                      var dataId = row.getAttribute("data-listing-id");
+                      (eval('featureLayer' + dataId))._geojson['properties']['marker-symbol']=j+1;
+                      (eval('featureLayer' + dataId)).setGeoJSON((eval('featureLayer' + dataId))._geojson);
+                    };
+                  };
+                  {% endfor %}
+                  
+
+
+                  });
+
+
+
+
+
+
                 </script>
 
     </div>
