@@ -263,6 +263,9 @@ def listing(listing_id):
 def about():
     return "https://www.linkedin.com/in/gscottstukey"
 
+@app.route('/contact')
+def contact():
+    return render_template('contact.html')
 
 if __name__ == '__main__':
     app.run(host='0.0.0.0', port=80, debug=True)
