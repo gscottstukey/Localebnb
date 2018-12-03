@@ -7,11 +7,11 @@
 
 ## Overview
 
-The motivation was: When booking a private residence, how do you find the perfect neighborhood?
+The motivation for this project was: When booking a private residence, how do you find the perfect neighborhood?
 
-It stems from my personal frustrations with Airbnb's search functionality while booking in Montreal.  I knew that I wanted to stay in an trendy neighborhood, but away from tourists & nightlife.  While I could search & filter Airbnb's search results by neighborhood, I had no idea what neighborhoods met my criteria!
+It stemed from my personal frustrations with Airbnb's search functionality while booking in Montreal.  I knew that I wanted to stay in a "trendier" neighborhood, but away from tourists & nightlife.  While I could search & filter Airbnb's search results by neighborhoods to stay, I had no idea what neighborhoods met my criteria!
 
-Localebnb aims to be that contextual recommender for Airbnb.
+Localebnb aimed to be that contextual recommender for Airbnb.
 
 Using Airbnb listing descriptions (features) + Airbnb's neighborhood guides for traits (target ), I built an app that predicts whether a listing is in a neighborhood with a specified trait, and then I use that information to score & re-sort the default search results provided by Airbnb.
 
@@ -20,7 +20,7 @@ Using Airbnb listing descriptions (features) + Airbnb's neighborhood guides for 
 ##How to Use
 
 *Note: it is best to use this app on desktop with a large window*
-* Go to the [Localebnb app](http://localebnb.co)
+* Go to the [Localebnb app](http://localebnb.co) - note: this project is no longer live as of late 2015...
 * Enter in your search criteria (city, dates, guests), as well as neighborhood trait preferences ('is artsy, 'has shopping', etc)
 * Click "Search Airbnb" - this scrapes Airbnb's search results & listings, predicts the traits for each listing, then scores & re-sorts the search results
 * On the search result page, you can resort by the column header. You can also change your preferences and see how that changes the search results.
@@ -37,9 +37,9 @@ I scraped 4 types of pages across Airbnb for data:
 * [City Guides](https://www.airbnb.com/locations) for SF & NYC (e.g. https://www.airbnb.com/locations/san-francisco)
 * Neighborhood Guides for all neighborhoods(https://www.airbnb.com/locations/san-francisco/duboce-triangle)
 
-I mapped listings to neighborhoods & neighborhoods to traits to come up with my labeled dataset (listings -> traits). I then cleaned up the description using NLP techniques, vectorized the description using TF-IDF, and used a variety of models on this information. SVM's provided the highest accuracy (~78-82%, a 5 pt lift over naive bayes). Interestingly enough, when attempting to create a 'majority vote' ensemble (NB + SVM + Random Forest), the accuracty decreased slight against individual models. This denotes that each of these 3 models are able to pick up features that neither of the other 2 are able to.
+I mapped listings to neighborhoods & neighborhoods to traits to come up with my labeled dataset (listings -> traits). I then cleaned up the description using NLP techniques, vectorized the description using TF-IDF, and used a variety of models on this information. SVM's provided the highest accuracy (~78-82%, a 5 pt lift over a naive bayes model). Interestingly enough, when attempting to create a 'majority vote' ensemble (NB + SVM + Random Forest), the accuracty decreased slight against each of the individual models. This denotes that each of these 3 models are able to pick up certain features that neither of the other 2 are able to.
 
-I also ran a Doc2Vec (Word2Vec) model using the cleaned descriptions as sentences & the neighborhood traits & cities as label. Howerver, due to the size of my corpus, this data proved insufficient for for use in Localebnb.  With a much larger training set, I'd love to revisit this method.
+I also ran a Doc2Vec (Word2Vec) model using the cleaned descriptions as sentences & the neighborhood traits & cities as label. However, due to the size of my corpus, this data proved insufficient for for use in Localebnb.  With a much larger training set, I'd love to revisit this method.
 
 
 ## Additional Applications of this methodology.
@@ -48,7 +48,7 @@ There are many applications for this data & methodology.
 
 Why Airbnb should implement this:
 * **User Value:** Increase user satisfaction by increasing relevance
-* **Business Value (revenue):** Increase booking rate by reducing bounces (click fatigue)
+* **Business Value (revenue):** Increase booking rate by reducing bounces (& click fatigue)
 * **Business Value (content team):** Guide creation of neighborhood guides in new cities
 * ***Word2Vec Bonus
 note: The inclusion of a trait model for search results would need to be tested against existing systems. The potential negatives may include the increase of options (i.e. the paradox of choice) and/or the contextualized search lowers the costs of the listings that people book at.
@@ -89,11 +89,10 @@ Also, [Galvanize (a.k.a. Zipfian Academy)](http://www.zipfianacademy.com/) & its
 A special thank you (/slash/ apology) to Airbnb, whose amazing service was an inspiration for this project. I hope you are inspired by Localebnb to explore include neighborhood description search/filtering functionality in your search
 
 -G Scott Stukey
-* @gscottstukey
-"I like my data like I like my denim... raw"
+
 
 ## Glossary of Terms
 * [TF-IDF aka Term Frequency - Inverse Document Frequency](http://en.wikipedia.org/wiki/Tf%E2%80%93idf)
 * [Naive-Bayes Classification](https://en.wikipedia.org/wiki/Naive_Bayes_classifier)
 * [Support Vector Machines](https://en.wikipedia.org/wiki/Support_vector_machine)
-* [Word2Vec](http://code.google.com/p/word2vec/) - I ::heartemoji:: Word2Vec so hard
+* [Word2Vec](http://code.google.com/p/word2vec/)
